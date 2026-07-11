@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, Client } from "discord.js";
-import { RawInteractionData } from "discord.js/typings/rawDataTypes";
+import { RawInteractionData } from '../../node_modules/discord.js/typings/rawDataTypes';
 import Bot from "./bot";
 
 export default class BChatInputCommandInteraction extends ChatInputCommandInteraction {

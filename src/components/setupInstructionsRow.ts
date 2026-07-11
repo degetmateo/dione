@@ -1,21 +1,20 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
 import { ANILIST_AUTH_URL } from "../consts";
+import ComponentsID from "../static/componentsId";
 
-export default class SetupInstructionsRow extends ActionRowBuilder<ButtonBuilder> {
-    public static readonly buttonId: string = 'buttonCode';
-    
+export default class SetupInstructionsRow extends ActionRowBuilder<ButtonBuilder> {    
     constructor () {
         super();
 
         const buttonURL = new ButtonBuilder({
             style: ButtonStyle.Link,
             url: ANILIST_AUTH_URL,
-            label: 'Autorizar',
+            label: 'Autorizar'
         });
 
         const buttonCode = new ButtonBuilder({
             style: ButtonStyle.Primary,
-            custom_id: SetupInstructionsRow.buttonId,
+            custom_id: ComponentsID.SetupButton,
             label: 'Ingresar código',
         });
 

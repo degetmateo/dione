@@ -1,8 +1,11 @@
-import 'dotenv/config';
-import { TOKEN } from "./consts";
-import Bot from './extensions/bot';
-import postgres from './database/postgres';
+/// <reference path="../env.d.ts" />
 
-const bot = new Bot();
-postgres.init();
-bot.login(TOKEN);
+import Bot from './extensions/bot';
+import mongo from "./database/mongo";
+
+const init = async () => {
+    await mongo.init();
+    new Bot().login(process.env.TOKEN);
+};
+
+init();
