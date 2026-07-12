@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node --env-file=.env ./dist/index.js",
     "dev": "tsx --env-file=.env ./src/index.ts",
+    "migrate": "tsx --env-file=.env ./scripts/migrate.ts",
     "build": "tsc",
     "deploy-commands-global": "ts-node ./scripts/deploy-commands-global.ts",
     "deploy-commands-guild": "ts-node ./scripts/deploy-commands-guild.ts",
@@ -32,7 +33,6 @@
     "discord.js": "^14.26.4",
     "iso-639-1": "^3.1.5",
     "mongodb": "^7.5.0",
-    "postgres": "^3.4.7",
     "uuid": "^14.0.1"
   },
   "devDependencies": {

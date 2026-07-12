@@ -15,7 +15,7 @@ export default class VNEmbed extends EmbedBuilder {
         this.setImage(Helpers.getRandomElement(vn.screenshots)?.url || null);
 
         this.setFooter({
-            text: vn.aliases.join(' | ') || null
+            text: vn.aliases.join(' | ') || ''
         });
 
         let tags = vn.tags.slice(0, 9).map(p => `\`${p.name}\``).join(' - ');

@@ -27,7 +27,7 @@ export type VN = {
     }>;
 };
 
-export const DEVSTATUS = {
+export const DEVSTATUS: any = {
     0: "FINISHED",
     1: "IN DEVELOPMENT",
     2: "CANCELLED"

@@ -27,7 +27,11 @@ export default class Bot extends Client<true> {
 
     constructor () {
         super({
-            intents: [GatewayIntentBits.Guilds]
+            intents: [
+                GatewayIntentBits.Guilds,
+                GatewayIntentBits.GuildMembers,
+                GatewayIntentBits.GuildPresences
+            ]
         });
 
         this.commands = new Collection();

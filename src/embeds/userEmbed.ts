@@ -16,13 +16,13 @@ export default class UserEmbed extends EmbedBuilder {
 
         const worstBayesianScores = user.getGenresSortedByBayesianScore().slice(user.getGenresSortedByBayesianScore().length - 3, user.getGenresSortedByBayesianScore().length).map(g => g.genre);
 
-        const completedAnime = user.data.statistics.anime.statuses.find(s => s.status == 'COMPLETED');
-        const droppedAnime = user.data.statistics.anime.statuses.find(s => s.status == 'DROPPED');
-        const currentAnime = user.data.statistics.anime.statuses.find(s => s.status=='CURRENT');
+        const completedAnime = user.data.statistics.anime.statuses.find((s: any) => s.status == 'COMPLETED');
+        const droppedAnime = user.data.statistics.anime.statuses.find((s: any) => s.status == 'DROPPED');
+        const currentAnime = user.data.statistics.anime.statuses.find((s: any) => s.status=='CURRENT');
 
-        const completedManga = user.data.statistics.manga.statuses.find(s => s.status == 'COMPLETED');
-        const droppedManga = user.data.statistics.manga.statuses.find(s => s.status == 'DROPPED');
-        const currentManga = user.data.statistics.manga.statuses.find(s => s.status=='CURRENT');
+        const completedManga = user.data.statistics.manga.statuses.find((s: any) => s.status == 'COMPLETED');
+        const droppedManga = user.data.statistics.manga.statuses.find((s: any) => s.status == 'DROPPED');
+        const currentManga = user.data.statistics.manga.statuses.find((s: any) => s.status=='CURRENT');
 
         this.setDescription(
             `**[${user.getName()}](${user.getSiteURL()})**\n` +
