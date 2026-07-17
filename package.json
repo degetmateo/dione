@@ -8,8 +8,10 @@
     "dev": "tsx --env-file=.env ./src/index.ts",
     "migrate": "tsx --env-file=.env ./scripts/migrate.ts",
     "build": "tsc",
-    "deploy-commands-global": "ts-node ./scripts/deploy-commands-global.ts",
+    
+    "deploy-commands-global": "tsx --env-file=.env ./scripts/deploy-commands-global.ts",
     "deploy-commands-guild": "ts-node ./scripts/deploy-commands-guild.ts",
+
     "delete-command-guild": "ts-node ./scripts/delete-command-guild.ts",
     "delete-commands-global": "ts-node ./scripts/delete-commands-global.ts",
     "delete-commands-guild": "ts-node ./scripts/delete-commands-guild.ts",
