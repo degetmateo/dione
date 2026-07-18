@@ -6,7 +6,7 @@ const exchangeExecute = async (interaction: GuildChatInputCommandInteraction) =>
     const subcommand = interaction.options.getSubcommand();
 
     if (subcommand === 'help') {
-        await interaction.reply({
+        return await interaction.reply({
             embeds: [new ExchangeHelpEmbed()]
         });
     };
@@ -14,7 +14,7 @@ const exchangeExecute = async (interaction: GuildChatInputCommandInteraction) =>
     await interaction.deferReply();
 
     if (subcommand === 'create') {
-        await exchangeCreateExecute(interaction);
+        return await exchangeCreateExecute(interaction);
     };
 
     if (subcommand === 'complete') {
