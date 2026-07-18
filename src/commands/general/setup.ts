@@ -1,12 +1,12 @@
 import { Interaction, InteractionContextType, MessageFlags, SlashCommandBuilder } from "discord.js";
-import BChatInputCommandInteraction from "../../../extensions/interaction";
-import SetupInstructionsEmbed from "../../../builders/embeds/setupInstructions.embed";
-import SetupButtonsComponent from "../../../builders/components/setupButtons.component";
-import setupCollector from "../../../collectors/setup.collector";
-import responsesHelper from "../../../helpers/responses.helper";
-import ErrorEmbed from "../../../embeds/errorEmbed";
+import SetupInstructionsEmbed from "../../builders/embeds/setupInstructions.embed";
+import SetupButtonsComponent from "../../builders/components/setupButtons.component";
+import setupCollector from "../../collectors/setup.collector";
+import responsesHelper from "../../helpers/responses.helper";
+import ErrorEmbed from "../../embeds/errorEmbed";
+import GuildChatInputCommandInteraction from "../../extensions/guildChatInputCommandInteraction.extension";
 
-const execute = async (interaction: BChatInputCommandInteraction) => {
+const execute = async (interaction: GuildChatInputCommandInteraction) => {
     try {
         const response = await interaction.reply({
             flags: [MessageFlags.Ephemeral],

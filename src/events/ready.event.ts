@@ -1,5 +1,5 @@
 import { ActivitiesOptions, ActivityType, Events } from 'discord.js';
-import Bot from '../extensions/bot';
+import Bot from '../extensions/bot.extension';
 
 module.exports = {
 	name: Events.ClientReady,

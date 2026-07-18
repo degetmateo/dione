@@ -1,9 +1,10 @@
 import { ChatInputCommandInteraction, Client, Guild } from "discord.js";
 import { RawInteractionData } from '../../node_modules/discord.js/typings/rawDataTypes';
-import Bot from "./bot";
+import Bot from "./bot.extension";
 
-export default class BChatInputCommandInteraction extends ChatInputCommandInteraction {
+export default class GuildChatInputCommandInteraction extends ChatInputCommandInteraction {
     public client: Bot;
+    
     public get guild(): Guild {
         return this.guild;
     }

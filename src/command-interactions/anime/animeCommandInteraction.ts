@@ -10,11 +10,12 @@ import ErrorEmbed from "../../embeds/errorEmbed";
 import ScoresEmbed from "../../embeds/scoresEmbed";
 import searchScores from "../../apis/anilist/searchScores";
 import mongo from "../../database/mongo";
+import GuildChatInputCommandInteraction from "../../extensions/guildChatInputCommandInteraction.extension";
 
 export default class AnimeCommandInteraction {
-    private interaction: ChatInputCommandInteraction;
+    private interaction: GuildChatInputCommandInteraction;
     
-    constructor (interaction: ChatInputCommandInteraction) {
+    constructor (interaction: GuildChatInputCommandInteraction) {
         this.interaction = interaction;
     };
 

@@ -1,7 +1,7 @@
 import { InteractionContextType, SlashCommandBuilder } from "discord.js";
-import BChatInputCommandInteraction from "../../../extensions/interaction";
-import GenericError from "../../../errors/genericError";
-import RandomCommandInteraction from "../../../command-interactions/random/randomCommandInteraction";
+import GenericError from "../../errors/genericError";
+import RandomCommandInteraction from "../../command-interactions/random/randomCommandInteraction";
+import GuildChatInputCommandInteraction from "../../extensions/guildChatInputCommandInteraction.extension";
 
 module.exports = {
     cooldown: 5,
@@ -20,7 +20,7 @@ module.exports = {
                     { name: 'Manga', value: 'MANGA' }
                 )
         }),
-    execute: async (interaction: BChatInputCommandInteraction) => {
+    execute: async (interaction: GuildChatInputCommandInteraction) => {
         try {
             await new RandomCommandInteraction(interaction).execute();
         } catch (error) {

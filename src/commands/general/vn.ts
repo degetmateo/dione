@@ -1,7 +1,7 @@
 import { InteractionContextType, SlashCommandBuilder } from "discord.js";
-import BChatInputCommandInteraction from "../../../extensions/interaction";
-import GenericError from "../../../errors/genericError";
-import VNCommandInteraction from "../../../command-interactions/vn/vnCommandInteraction";
+import GenericError from "../../errors/genericError";
+import VNCommandInteraction from "../../command-interactions/vn/vnCommandInteraction";
+import GuildChatInputCommandInteraction from "../../extensions/guildChatInputCommandInteraction.extension";
 
 module.exports = {
     cooldown: 10,
@@ -16,7 +16,7 @@ module.exports = {
                 .setDescription('Name or ID of the Visual Novel.')
                 .setRequired(true)
         }),
-    execute: async (interaction: BChatInputCommandInteraction) => {
+    execute: async (interaction: GuildChatInputCommandInteraction) => {
         try {
             await new VNCommandInteraction(interaction).execute();
         } catch (error) {

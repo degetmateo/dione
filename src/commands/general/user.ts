@@ -1,12 +1,12 @@
 import { InteractionContextType, SlashCommandBuilder } from "discord.js";
-import GenericError from "../../../errors/genericError";
-import BChatInputCommandInteraction from "../../../extensions/interaction";
-import mongo from "../../../database/mongo";
-import UserEmbed from "../../../embeds/userEmbed";
-import AnilistUser from "../../../models/anilist/anilistUser";
-import anilistUserRequest from "../../../requests/anilistUser.request";
+import GenericError from "../../errors/genericError";
+import mongo from "../../database/mongo";
+import UserEmbed from "../../embeds/userEmbed";
+import AnilistUser from "../../models/anilist/anilistUser";
+import anilistUserRequest from "../../requests/anilistUser.request";
+import GuildChatInputCommandInteraction from "../../extensions/guildChatInputCommandInteraction.extension";
 
-const execute = async (interaction: BChatInputCommandInteraction) => {
+const execute = async (interaction: GuildChatInputCommandInteraction) => {
     await interaction.deferReply();
 
     const memberId = interaction.options.getUser('member')?.id || interaction.user.id;

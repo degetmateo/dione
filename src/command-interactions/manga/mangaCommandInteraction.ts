@@ -5,18 +5,17 @@ import SuccessEmbed from "../../embeds/successEmbed";
 import GenericError from "../../errors/genericError";
 import ErrorEmbed from "../../embeds/errorEmbed";
 import ScoresEmbed from "../../embeds/scoresEmbed";
-import BChatInputCommandInteraction from "../../extensions/interaction";
 import searchMangaById from "./searchMangaById";
 import MangaEmbed from "../../embeds/mangaEmbed";
 import searchMangaByName from "./searchMangaByName";
 import searchScores from "../../apis/anilist/searchScores";
-import LoadingEmbed from "../../embeds/loadingEmbed";
 import mongo from "../../database/mongo";
+import GuildChatInputCommandInteraction from "../../extensions/guildChatInputCommandInteraction.extension";
 
 export default class MangaCommandInteraction {
-    private interaction: BChatInputCommandInteraction;
+    private interaction: GuildChatInputCommandInteraction;
     
-    constructor (interaction: BChatInputCommandInteraction) {
+    constructor (interaction: GuildChatInputCommandInteraction) {
         this.interaction = interaction;
     };
 

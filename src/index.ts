@@ -1,6 +1,6 @@
 /// <reference path="../env.d.ts" />
 
-import Bot from './extensions/bot';
+import Bot from './extensions/bot.extension';
 import mongo from "./database/mongo";
 
 const init = async () => {

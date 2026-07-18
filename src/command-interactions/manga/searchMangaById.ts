@@ -1,6 +1,6 @@
 import Anilist from "../../services/anilist";
 
-export default async (id: string) => {
+export default async (id: string | number) => {
     const query = `
         query  {
             Media (id: ${id}, type: MANGA) {

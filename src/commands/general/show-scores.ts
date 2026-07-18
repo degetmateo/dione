@@ -1,10 +1,10 @@
 import { InteractionContextType, MessageFlags, SlashCommandBuilder } from "discord.js";
-import BChatInputCommandInteraction from "../../../extensions/interaction";
-import mongo from "../../../database/mongo";
-import GenericError from "../../../errors/genericError";
-import SuccessEmbed from "../../../embeds/successEmbed";
+import mongo from "../../database/mongo";
+import GenericError from "../../errors/genericError";
+import SuccessEmbed from "../../embeds/successEmbed";
+import GuildChatInputCommandInteraction from "../../extensions/guildChatInputCommandInteraction.extension";
 
-const execute = async (interaction: BChatInputCommandInteraction) => {
+const execute = async (interaction: GuildChatInputCommandInteraction) => {
     await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
     
     const enabled = interaction.options.getBoolean('enabled', true);

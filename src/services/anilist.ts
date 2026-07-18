@@ -39,8 +39,8 @@ export default class Anilist {
         const response: any = await request.json();
         
         if (!request.ok) {
-            const error = codes[response.errors[0].status];
-            if (error) throw new GenericError(error);
+            const message: any = codes[response.errors[0].status];
+            if (message) throw new GenericError(message, response.errors[0].status);
             else throw response.errors[0];
         };
 

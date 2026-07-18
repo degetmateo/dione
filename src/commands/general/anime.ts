@@ -1,6 +1,7 @@
-import { ChatInputCommandInteraction, InteractionContextType, SlashCommandBuilder } from "discord.js";
-import GenericError from "../../../errors/genericError";
-import AnimeCommandInteraction from "../../../command-interactions/anime/animeCommandInteraction";
+import { InteractionContextType, SlashCommandBuilder } from "discord.js";
+import GenericError from "../../errors/genericError";
+import AnimeCommandInteraction from "../../command-interactions/anime/animeCommandInteraction";
+import GuildChatInputCommandInteraction from "../../extensions/guildChatInputCommandInteraction.extension";
 
 module.exports = {
     cooldown: 10,
@@ -18,7 +19,7 @@ module.exports = {
                 .setDescriptionLocalization('es-ES', 'Nombre o ID del anime.')
                 .setRequired(true)
         ),
-    execute: async (interaction: ChatInputCommandInteraction) => {
+    execute: async (interaction: GuildChatInputCommandInteraction) => {
         try {
             await new AnimeCommandInteraction(interaction).execute();
         } catch (error) {

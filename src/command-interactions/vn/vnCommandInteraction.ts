@@ -1,14 +1,12 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
 import VNDB from "../../apis/vndb/vndb";
-import LoadingEmbed from "../../embeds/loadingEmbed";
-import SuccessEmbed from "../../embeds/successEmbed";
 import VNEmbed from "../../embeds/vnEmbed";
-import BChatInputCommandInteraction from "../../extensions/interaction";
+import GuildChatInputCommandInteraction from "../../extensions/guildChatInputCommandInteraction.extension";
 
 export default class VNCommandInteraction {
-    private interaction: BChatInputCommandInteraction;
+    private interaction: GuildChatInputCommandInteraction;
     
-    constructor (interaction: BChatInputCommandInteraction) {
+    constructor (interaction: GuildChatInputCommandInteraction) {
         this.interaction = interaction;
     };
 

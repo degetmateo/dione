@@ -1,15 +1,15 @@
-import { ChatInputCommandInteraction } from "discord.js";
 import GenericError from "../../errors/genericError";
 import getRandom from "./getRandom";
 import Helpers from "../../helpers";
 import AnimeEmbed from "../../embeds/animeEmbed";
 import MangaEmbed from "../../embeds/mangaEmbed";
 import mongo from "../../database/mongo";
+import GuildChatInputCommandInteraction from "../../extensions/guildChatInputCommandInteraction.extension";
 
 export default class RandomCommandInteraction {
-    private interaction: ChatInputCommandInteraction;
+    private interaction: GuildChatInputCommandInteraction;
     
-    constructor (interaction: ChatInputCommandInteraction) {
+    constructor (interaction: GuildChatInputCommandInteraction) {
         this.interaction = interaction;
     };
 

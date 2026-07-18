@@ -1,13 +1,12 @@
 import { MessageFlags } from "discord.js";
-import Bot from "../extensions/bot";
 import GenericError from "../errors/genericError";
 import ErrorEmbed from "../embeds/errorEmbed";
 import cooldownsHelper from "../helpers/cooldowns.helper";
-import BChatInputCommandInteraction from "../extensions/interaction";
 import responsesHelper from "../helpers/responses.helper";
+import GuildChatInputCommandInteraction from "../extensions/guildChatInputCommandInteraction.extension";
 
 export default {
-    execute: async (interaction: BChatInputCommandInteraction) => {
+    execute: async (interaction: GuildChatInputCommandInteraction) => {
         try {
             const command = interaction.client.commands.get(interaction.commandName);
             

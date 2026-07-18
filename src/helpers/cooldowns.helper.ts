@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, Collection } from "discord.js";
-import Bot from "../extensions/bot";
+import Bot from "../extensions/bot.extension";
 import GenericError from "../errors/genericError";
 import cooldownMessages from "../static/cooldownMessages";
 

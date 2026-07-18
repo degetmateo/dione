@@ -4,11 +4,12 @@ import searchUser from "./searchUser";
 import UserEmbed from "../../embeds/userEmbed";
 import AnilistUser from "../../models/anilist/anilistUser";
 import mongo from "../../database/mongo";
+import GuildChatInputCommandInteraction from "../../extensions/guildChatInputCommandInteraction.extension";
 
 export default class UserCommandInteraction {
-    private interaction: ChatInputCommandInteraction;
+    private interaction: GuildChatInputCommandInteraction;
     
-    constructor (interaction: ChatInputCommandInteraction) {
+    constructor (interaction: GuildChatInputCommandInteraction) {
         this.interaction = interaction;
     };
 

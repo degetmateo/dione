@@ -1,13 +1,13 @@
 import path from 'path';
 import fs from 'fs';
-import Bot from '../extensions/bot';
+import Bot from '../extensions/bot.extension';
 
 let paths: string[] = [];
 
 const load = (bot: Bot) => {
     paths = [];
 
-    const foldersPath = path.join(__dirname, '../executioners/commands');
+    const foldersPath = path.join(__dirname, '../commands');
     const commandFolders = fs.readdirSync(foldersPath);
 
     for (const folder of commandFolders) {

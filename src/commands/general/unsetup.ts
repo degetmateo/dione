@@ -1,12 +1,12 @@
 import { InteractionContextType, MessageFlags, SlashCommandBuilder } from "discord.js";
-import BChatInputCommandInteraction from "../../../extensions/interaction";
-import responsesHelper from "../../../helpers/responses.helper";
-import ErrorEmbed from "../../../embeds/errorEmbed";
-import mongo from "../../../database/mongo";
-import GenericError from "../../../errors/genericError";
-import SuccessEmbed from "../../../embeds/successEmbed";
+import responsesHelper from "../../helpers/responses.helper";
+import ErrorEmbed from "../../embeds/errorEmbed";
+import mongo from "../../database/mongo";
+import GenericError from "../../errors/genericError";
+import SuccessEmbed from "../../embeds/successEmbed";
+import GuildChatInputCommandInteraction from "../../extensions/guildChatInputCommandInteraction.extension";
 
-const execute = async (interaction: BChatInputCommandInteraction) => {
+const execute = async (interaction: GuildChatInputCommandInteraction) => {
     try {
         await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
 

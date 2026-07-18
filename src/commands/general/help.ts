@@ -1,8 +1,8 @@
 import { InteractionContextType, MessageFlags, SlashCommandBuilder } from "discord.js";
-import BChatInputCommandInteraction from "../../../extensions/interaction";
-import HelpEmbed from "../../../embeds/helpEmbed";
+import HelpEmbed from "../../embeds/helpEmbed";
+import GuildChatInputCommandInteraction from "../../extensions/guildChatInputCommandInteraction.extension";
 
-const execute = async (interaction: BChatInputCommandInteraction) => {
+const execute = async (interaction: GuildChatInputCommandInteraction) => {
     await interaction.reply({
         embeds: [new HelpEmbed()],
         flags: [MessageFlags.Ephemeral]
