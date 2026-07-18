@@ -9,6 +9,8 @@ export default class GuildChatInputCommandInteraction extends ChatInputCommandIn
         return this.guild;
     }
 
+    public data: any;
+
     constructor (client: Client<true>, data: RawInteractionData) {
         super(client, data);
         this.client = client as Bot;

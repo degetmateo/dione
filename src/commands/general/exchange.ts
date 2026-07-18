@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, InteractionContextType } from "discord.js";
-import exchangeExecute from "./execute/exchange/exchange.execute";
+import exchangeCommandExecute from "./execute/exchange/exchange.command.execute";
 
 module.exports = {
     // cooldown: 25,
@@ -47,5 +47,5 @@ module.exports = {
                 .setName('cancel')
                 .setDescription('Cancelar el intercambio que tienes activo.')
         }),
-    execute: exchangeExecute
+    execute: exchangeCommandExecute
 };

@@ -1,6 +1,8 @@
 import ExchangeHelpEmbed from "../../../../builders/embeds/exchangeHelp.embed";
 import GuildChatInputCommandInteraction from "../../../../extensions/guildChatInputCommandInteraction.extension";
-import exchangeCreateExecute from "./exchange.create.execute";
+import exchangeCancelCommandExecute from "./exchange.cancel.command.execute";
+import exchangeCompleteCommandExecute from "./exchange.complete.command.execute";
+import exchangeCreateCommandExecute from "./exchange.create.command.execute";
 
 const exchangeExecute = async (interaction: GuildChatInputCommandInteraction) => {
     const subcommand = interaction.options.getSubcommand();
@@ -11,22 +13,16 @@ const exchangeExecute = async (interaction: GuildChatInputCommandInteraction) =>
         });
     };
 
-    await interaction.deferReply();
-
     if (subcommand === 'create') {
-        return await exchangeCreateExecute(interaction);
+        return await exchangeCreateCommandExecute(interaction);
     };
 
     if (subcommand === 'complete') {
-        await interaction.editReply({
-            content: "exchamge complete"
-        });
+        return await exchangeCompleteCommandExecute(interaction);
     };
 
     if (subcommand === 'cancel') {
-        await interaction.editReply({
-            content: "exchamge cancel"
-        });
+        return await exchangeCancelCommandExecute(interaction);
     };
 };
 

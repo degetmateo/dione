@@ -18,7 +18,7 @@ export default class Anilist {
         
         if (!request.ok) {
             const error = codes[response.errors[0].status];
-            if (error) throw new GenericError(error);
+            if (error) throw new GenericError(error, response.errors[0].status);
             else throw response.errors[0];
         };
 
