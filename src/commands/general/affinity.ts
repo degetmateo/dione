@@ -1,21 +1,28 @@
-import { InteractionContextType, SlashCommandBuilder } from "discord.js";
+import { InteractionContextType, MessageFlags, SlashCommandBuilder, User } from "discord.js";
 import GenericError from "../../errors/genericError";
 import mongo from "../../database/mongo";
-import { MediaEntry } from "../../types/anilist";
 import Helpers from "../../helpers";
 import AffinityEmbed from "../../embeds/affinityEmbed";
-import searchEntries from "../../command-interactions/affinity/searchEntries";
 import guildsRepository from "../../repositories/guilds/guilds.repository";
 import GuildChatInputCommandInteraction from "../../extensions/guildChatInputCommandInteraction.extension";
+import anilist from "../../apis/anilist/anilist";
+import ErrorEmbed from "../../embeds/errorEmbed";
+import { MediaEntry } from "../../apis/anilist/types";
 
 const execute = async (interaction: GuildChatInputCommandInteraction) => {
-    await interaction.deferReply();
-
     const memberOptionA = interaction.options.getUser('member', true);
     const memberOptionB = interaction.options.getUser('member-b', false) || interaction.user;
+    
+    if (memberOptionA.id == memberOptionB.id) {
+        return await interaction.reply({
+            flags: [MessageFlags.Ephemeral],            
+            embeds: [new ErrorEmbed('No puedes calcular la afinidad contigo mismo.')]
+        });
+    };
+
+    await interaction.deferReply();
 
     const members = mongo.collection('members');
-
     const memberB = await members.findOne({ discord_id: memberOptionB.id });
 
     if (!memberB) { 
@@ -29,7 +36,7 @@ const execute = async (interaction: GuildChatInputCommandInteraction) => {
     const memberA = await members.findOne({ discord_id: memberOptionA.id });
     if (!memberA) throw new GenericError(`<@${memberOptionA.id}> no está registrado. 💔`);
 
-    const data = await searchEntries(memberB.anilist.id, memberA.anilist.id);
+    const data = await anilist.search.entries(memberB.anilist.id, memberA.anilist.id);
 
     const interactionUserAnime: Array<MediaEntry> = data.u1_anime.lists[0].entries;
     const interactionUserManga: Array<MediaEntry> = data.u1_manga.lists[0].entries;

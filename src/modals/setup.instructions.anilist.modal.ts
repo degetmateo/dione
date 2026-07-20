@@ -1,9 +1,9 @@
 import { MessageFlags, ModalSubmitInteraction } from "discord.js";
 import Bot from "../extensions/bot.extension";
-import viewerRequest from "../requests/viewer.request";
 import mongo from "../database/mongo";
 import ErrorEmbed from "../embeds/errorEmbed";
 import SetupSuccessEmbed from "../builders/embeds/setupSuccess.embed";
+import anilist from "../apis/anilist/anilist";
 
 module.exports = {
     id: 'setup-instructions-anilist-modal',
@@ -30,7 +30,7 @@ module.exports = {
         await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
 
         const token = interaction.fields.getTextInputValue('setup-instructions-anilist-input');
-        const viewer = await viewerRequest.execute(token);
+        const viewer = await anilist.viewer(token);
     
         const members = mongo.collection('members');
 

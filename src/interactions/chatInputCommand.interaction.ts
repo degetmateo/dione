@@ -19,7 +19,11 @@ export default {
             await command.execute(interaction);
         } catch (error: any) {
             console.error(error);
-            await responsesHelper.execute(interaction, [new ErrorEmbed(error.message)], { flags: [MessageFlags.Ephemeral] });
+            if (error instanceof GenericError) {
+                await responsesHelper.execute(interaction, [new ErrorEmbed(error.message)], { flags: [MessageFlags.Ephemeral] });
+            } else {
+                await responsesHelper.execute(interaction, [new ErrorEmbed('Ha ocurrido un error inesperado.')], { flags: [MessageFlags.Ephemeral] });
+            };
         }
     }
 };

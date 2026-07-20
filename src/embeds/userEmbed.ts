@@ -1,10 +1,10 @@
 import { ColorResolvable, EmbedBuilder } from "discord.js";
 import toHex from 'colornames';
 import Helpers from "../helpers";
-import AnilistUser from "../models/anilist/anilistUser";
+import Aniuser from "../apis/anilist/models/aniuser";
 
 export default class UserEmbed extends EmbedBuilder {
-    constructor (user: AnilistUser) {
+    constructor (user: Aniuser) {
         super();
         
         this

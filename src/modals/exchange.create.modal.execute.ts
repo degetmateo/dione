@@ -1,10 +1,9 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags, ModalSubmitInteraction } from "discord.js";
-import searchAnimeById from "../command-interactions/anime/searchAnimeById";
-import searchMangaById from "../command-interactions/manga/searchMangaById";
 import GenericError from "../errors/genericError";
 import ErrorEmbed from "../embeds/errorEmbed";
 import AnimeEmbed from "../embeds/animeEmbed";
 import MangaEmbed from "../embeds/mangaEmbed";
+import anilist from "../apis/anilist/anilist";
 
 module.exports = {
     id: 'exchange-create-modal',
@@ -47,9 +46,9 @@ module.exports = {
 
         try {
             if (typeMediaMemberB === 'ANIME') {
-                mediaB = await searchAnimeById(idMediaMemberB);
+                mediaB = await anilist.search.anime.id(idMediaMemberB);
             } else if (typeMediaMemberB === 'MANGA') {
-                mediaB = await searchMangaById(idMediaMemberB);
+                mediaB = await anilist.search.manga.id(idMediaMemberB);
             } else {
                 throw new GenericError();
             };

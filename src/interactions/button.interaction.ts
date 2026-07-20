@@ -2,6 +2,7 @@ import { ButtonInteraction, MessageFlags } from "discord.js";
 import responsesHelper from "../helpers/responses.helper";
 import ErrorEmbed from "../embeds/errorEmbed";
 import Bot from "../extensions/bot.extension";
+import GenericError from "../errors/genericError";
 
 export default {
     execute: async (interaction: ButtonInteraction) => {
@@ -17,7 +18,11 @@ export default {
             };
         } catch (error: any) {
             console.error(error);
-            await responsesHelper.execute(interaction, [new ErrorEmbed(error.message)], { flags: [MessageFlags.Ephemeral] });
+            if (error instanceof GenericError) {
+                await responsesHelper.execute(interaction, [new ErrorEmbed(error.message)], { flags: [MessageFlags.Ephemeral] });
+            } else {
+                await responsesHelper.execute(interaction, [new ErrorEmbed('Ha ocurrido un error inesperado.')], { flags: [MessageFlags.Ephemeral] });
+            };        
         };
     }
 };

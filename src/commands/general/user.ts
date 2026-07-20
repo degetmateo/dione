@@ -2,9 +2,9 @@ import { InteractionContextType, SlashCommandBuilder } from "discord.js";
 import GenericError from "../../errors/genericError";
 import mongo from "../../database/mongo";
 import UserEmbed from "../../embeds/userEmbed";
-import AnilistUser from "../../models/anilist/anilistUser";
-import anilistUserRequest from "../../requests/anilistUser.request";
 import GuildChatInputCommandInteraction from "../../extensions/guildChatInputCommandInteraction.extension";
+import anilist from "../../apis/anilist/anilist";
+import Aniuser from "../../apis/anilist/models/aniuser";
 
 const execute = async (interaction: GuildChatInputCommandInteraction) => {
     await interaction.deferReply();
@@ -22,10 +22,10 @@ const execute = async (interaction: GuildChatInputCommandInteraction) => {
         };
     };
 
-    const user = await anilistUserRequest.execute(member.anilist.id);
+    const user = await anilist.search.user(member.anilist.id);
 
     await interaction.editReply({
-        embeds: [new UserEmbed(new AnilistUser(user))]
+        embeds: [new UserEmbed(new Aniuser(user))]
     });
 };
 

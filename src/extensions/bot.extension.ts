@@ -48,17 +48,32 @@ export default class Bot extends Client<true> {
 
     set (data: any, expireIn?: number) {
         const key = Date.now().toString(36);
-        
+
+        data.key = key;
+
         if (!data.caches) data.caches = [];
         data.caches.push(key);
 
+        if (!data.timeout) {
+            data.timeout = setTimeout(() => {
+                this.cache.delete(key);
+            }, expireIn || 60_000);
+        };
+
         this.cache.set(key, data);
 
-        setTimeout(() => {
-            this.cache.delete(key);
-        }, expireIn || 60_000);
-
         return key;
+    };
+
+    update (key: string, data: any, expireIn?: number) {
+        if (expireIn) {
+            clearTimeout(data.timeout);
+            data.timeout = setTimeout(() => {
+                this.cache.delete(key);
+            }, expireIn || 60_000);
+        };
+
+        this.cache.set(key, data);
     };
 
     get (key: string) {

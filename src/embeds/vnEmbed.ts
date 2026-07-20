@@ -14,9 +14,11 @@ export default class VNEmbed extends EmbedBuilder {
         this.setThumbnail(vn.image.url);
         this.setImage(Helpers.getRandomElement(vn.screenshots)?.url || null);
 
-        this.setFooter({
-            text: vn.aliases.join(' | ') || ''
-        });
+        if (vn.aliases.length > 0) {
+            this.setFooter({
+                text: vn.aliases.join(' | ')
+            });
+        };
 
         let tags = vn.tags.slice(0, 9).map(p => `\`${p.name}\``).join(' - ');
         if (vn.tags.length > 10) tags += ` - \`and ${vn.tags.length - 10} more...\``;

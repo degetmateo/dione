@@ -1,7 +1,5 @@
 import { InteractionContextType, SlashCommandBuilder } from "discord.js";
-import GenericError from "../../errors/genericError";
-import MangaCommandInteraction from "../../command-interactions/manga/mangaCommandInteraction";
-import GuildChatInputCommandInteraction from "../../extensions/guildChatInputCommandInteraction.extension";
+import mangaExecute from "./execute/manga/manga.execute";
 
 module.exports = {
     cooldown: 10,
@@ -19,16 +17,5 @@ module.exports = {
                 .setDescriptionLocalization('es-ES', 'Nombre o ID del manga.')
                 .setRequired(true)
         ),
-    execute: async (interaction: GuildChatInputCommandInteraction) => {
-        try {
-            await new MangaCommandInteraction(interaction).execute();
-        } catch (error) {
-            console.error(error);
-
-            if (error instanceof GenericError) throw error;
-            else {
-                throw new GenericError();
-            };
-        };
-    }
+    execute: mangaExecute
 };

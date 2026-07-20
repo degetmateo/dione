@@ -1,11 +1,10 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
-import searchAnimeById from "../../../../command-interactions/anime/searchAnimeById";
-import searchMangaById from "../../../../command-interactions/manga/searchMangaById";
 import ErrorEmbed from "../../../../embeds/errorEmbed";
 import GenericError from "../../../../errors/genericError";
 import GuildChatInputCommandInteraction from "../../../../extensions/guildChatInputCommandInteraction.extension";
 import AnimeEmbed from "../../../../embeds/animeEmbed";
 import MangaEmbed from "../../../../embeds/mangaEmbed";
+import anilist from "../../../../apis/anilist/anilist";
 
 const exchangeCreateExecute = async (interaction: GuildChatInputCommandInteraction) => {
     const optionMember = interaction.options.getUser('member', true);
@@ -24,9 +23,9 @@ const exchangeCreateExecute = async (interaction: GuildChatInputCommandInteracti
 
     try {
         if (mediaType === 'ANIME') {
-            media = await searchAnimeById(mediaId);
+            media = await anilist.search.anime.id(mediaId);
         } else if (mediaType === 'MANGA') {
-            media = await searchMangaById(mediaId);
+            media = await anilist.search.manga.id(mediaId);
         } else {
             throw new GenericError();
         };
