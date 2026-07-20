@@ -37,7 +37,7 @@ const exchangeCompleteCommandExecute = async (interaction: GuildChatInputCommand
     }, 60_000);
 
     const embed = new EmbedBuilder();
-    embed.setDescription(`Estás a punto de indicar que <@${memberA.exchanges.active.member.discord_id}> completó su parte del intercambio. ¿Estás seguro?`);
+    embed.setDescription(`Estás a punto de indicar que <@${memberA.exchanges.active.members.b.discord_id}> completó su parte del intercambio. ¿Estás seguro?`);
     embed.setColor(Colors.Yellow);
 
     const row = new ActionRowBuilder<ButtonBuilder>();
