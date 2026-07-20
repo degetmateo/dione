@@ -28,14 +28,14 @@ export default class MangaEmbed extends EmbedBuilder {
         this.setFooter({ text: titles.join(' | ') });
 
         const informacionCampos1 = `
-            ‣ **Formato**: ${data.format || 'Desconocido'}\n‣ **Estado**: ${data.status || 'Desconocido'}\n‣ **Calificación**: ${data.meanScore ? data.meanScore + '/100' : 'Desconocida'}\n‣ **Popularidad**: ${data.popularity || 'Desconocida'}
+            ‣ **Formato**: ${data.format || 'Desconocido'}\n‣ **Estado**: ${data.status || 'Desconocido'}\n‣ **Calificación**: ${data.meanScore ? data.meanScore + '/100' : 'Desconocida'}\n‣ **Popularidad**: ${data.popularity || 'Desconocida'}\n‣ **Favoritos**: ${data.favourites || 'Desconocido'}
         `;
 
         const fecha = data.startDate;
         const fechaText = fecha ? `${fecha.day}/${fecha.month}/${fecha.year}` : 'Desconocida';
 
         const informacionCampos2 = `
-            ‣ **Favoritos**: ${data.favourites || 'Desconocidos'}\n‣ **Emisión**: ${fechaText}\n‣ **Capítulos**: ${data.chapters || 'Desconocidos'}\n‣ **Volúmenes**: ${data.volumes || 'Desconocidos'}
+            ‣ **ID**: ${data.id}\n‣ **Emisión**: ${fechaText}\n‣ **Capítulos**: ${data.chapters || 'idk'}\n‣ **Volúmenes**: ${data.volumes || 'idk'}\n‣ **Fuente**: ${data.source || 'Desconocido'}
         `;
 
         this
@@ -48,5 +48,14 @@ export default class MangaEmbed extends EmbedBuilder {
                 '\`Desconocidos\`' : '`' + data.genres.join('` - `') + '`';
 
         this.addFields({ name: "▾ Géneros", value: generosInfo, inline: false })
+
+        const tagsData = data.tags || [];
+        const tags = tagsData.filter((t: { name: string; isMediaSpoiler: boolean }) => !t.isMediaSpoiler);
+        const tagsMapped = tags.map((t: any) => t.name);
+
+        const tagsValue = tags.length >= 1 ?
+            '`' + tagsMapped.join('` - `') + '`' : '`Desconocidos`';
+
+        this.addFields({ name: "▾ Etiquetas", value: tagsValue, inline: false });  
     };
 };

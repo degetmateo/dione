@@ -3,7 +3,7 @@ import Bot from "../extensions/bot.extension";
 import ErrorEmbed from "../embeds/errorEmbed";
 import mongo from "../database/mongo";
 
-export default async (interaction: ButtonInteraction) => {
+const execute = async (interaction: ButtonInteraction) => {
     const bot = interaction.client as Bot;
     const values = interaction.customId.split('_');
 
@@ -48,10 +48,13 @@ export default async (interaction: ButtonInteraction) => {
     embed.setColor(Colors.DarkRed);
     embed.setDescription(`<@${data.memberAID}> ha decidido cancelar el intercambio.`);
 
-    if (!interaction.channel?.isSendable()) return;
-
-    await interaction.channel?.send({
+    await interaction.editReply({
         content: `<@${data.memberBID}>, malas noticias...`,
         embeds: [embed]
     });
+};
+
+module.exports = {
+    execute: execute,
+    id: 'exchange-cancel-button'
 };

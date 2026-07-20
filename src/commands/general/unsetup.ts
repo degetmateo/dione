@@ -1,22 +1,28 @@
-import { InteractionContextType, MessageFlags, SlashCommandBuilder } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Colors, EmbedBuilder, InteractionContextType, MessageFlags, SlashCommandBuilder } from "discord.js";
 import responsesHelper from "../../helpers/responses.helper";
 import ErrorEmbed from "../../embeds/errorEmbed";
-import mongo from "../../database/mongo";
-import GenericError from "../../errors/genericError";
-import SuccessEmbed from "../../embeds/successEmbed";
 import GuildChatInputCommandInteraction from "../../extensions/guildChatInputCommandInteraction.extension";
 
 const execute = async (interaction: GuildChatInputCommandInteraction) => {
     try {
-        await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
+        const embed = new EmbedBuilder();
+        embed.setDescription(`Estás a punto de eliminar completamente tu perfil de Dione. Esto supondrá la pérdida de todos los datos que tienes en el bot. ¿Estás seguro de que quieres hacer esto?`);
+        embed.setColor(Colors.DarkRed);
 
-        const members = mongo.collection('members');
-        const member = await members.findOneAndDelete({ discord_id: interaction.user.id });
+        const id = interaction.client.set({}, 60_000);
 
-        if (!member) throw new GenericError("No estás registrado.");
+        const row = new ActionRowBuilder<ButtonBuilder>();
+        row.addComponents(
+            new ButtonBuilder()
+                .setCustomId(`unsetup-button_${id}`)
+                .setLabel('Eliminar mi perfil')
+                .setStyle(ButtonStyle.Danger)
+        );
 
-        await interaction.editReply({
-            embeds: [new SuccessEmbed("Eliminé correctamente tu cuenta.")]
+        return await interaction.reply({
+            flags: [MessageFlags.Ephemeral],
+            embeds: [embed],
+            components: [row]
         });
     } catch (error: any) {
         console.error(error);
@@ -28,7 +34,7 @@ module.exports = {
     cooldown: 60,
     data: new SlashCommandBuilder()
         .setName('unsetup')
-        .setDescription('Unsetup your account from the bot.')
+        .setDescription('Eliminar tu perfil del bot.')
         .setNSFW(false)
         .setContexts(InteractionContextType.Guild),
     execute: execute

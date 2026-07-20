@@ -3,6 +3,7 @@ import GuildChatInputCommandInteraction from "../../../../extensions/guildChatIn
 import exchangeCancelCommandExecute from "./exchange.cancel.command.execute";
 import exchangeCompleteCommandExecute from "./exchange.complete.command.execute";
 import exchangeCreateCommandExecute from "./exchange.create.command.execute";
+import exchangeHistoryCommandExecute from "./exchange.history.command.execute";
 
 const exchangeExecute = async (interaction: GuildChatInputCommandInteraction) => {
     const subcommand = interaction.options.getSubcommand();
@@ -23,6 +24,10 @@ const exchangeExecute = async (interaction: GuildChatInputCommandInteraction) =>
 
     if (subcommand === 'cancel') {
         return await exchangeCancelCommandExecute(interaction);
+    };
+
+    if (subcommand === 'history') {
+        return await exchangeHistoryCommandExecute(interaction);
     };
 };
 

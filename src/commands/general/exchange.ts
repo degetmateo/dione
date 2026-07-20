@@ -2,7 +2,7 @@ import { SlashCommandBuilder, InteractionContextType } from "discord.js";
 import exchangeCommandExecute from "./execute/exchange/exchange.command.execute";
 
 module.exports = {
-    // cooldown: 25,
+    cooldown: 5,
     data: new SlashCommandBuilder()
         .setName('exchange')
         .setDescription('Comandos relacionados a intercambios de animes/mangas.')
@@ -46,6 +46,17 @@ module.exports = {
             return subcommand
                 .setName('cancel')
                 .setDescription('Cancelar el intercambio que tienes activo.')
+        })
+        .addSubcommand(subcommand => {
+            return subcommand
+                .setName('history')
+                .setDescription('Ver el historial de intercambios de un usuario.')
+                .addUserOption(option => 
+                    option
+                        .setName('member')
+                        .setDescription('Un usuario.')
+                        .setRequired(false)
+                )
         }),
     execute: exchangeCommandExecute
 };

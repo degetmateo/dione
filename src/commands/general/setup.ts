@@ -1,25 +1,58 @@
-import { Interaction, InteractionContextType, MessageFlags, SlashCommandBuilder } from "discord.js";
-import SetupInstructionsEmbed from "../../builders/embeds/setupInstructions.embed";
-import SetupButtonsComponent from "../../builders/components/setupButtons.component";
-import setupCollector from "../../collectors/setup.collector";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Colors, EmbedBuilder, Interaction, InteractionContextType, MessageFlags, SlashCommandBuilder } from "discord.js";
+import * as uuid from 'uuid';
 import responsesHelper from "../../helpers/responses.helper";
 import ErrorEmbed from "../../embeds/errorEmbed";
 import GuildChatInputCommandInteraction from "../../extensions/guildChatInputCommandInteraction.extension";
+import mongo from "../../database/mongo";
+import { UUID } from "mongodb";
 
 const execute = async (interaction: GuildChatInputCommandInteraction) => {
     try {
-        const response = await interaction.reply({
-            flags: [MessageFlags.Ephemeral],
-            embeds: [new SetupInstructionsEmbed()],
-            components: [new SetupButtonsComponent()]
-        });
+        await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
 
-        const collector = response.createMessageComponentCollector({ time: 300000 });
+        const members = mongo.collection('members');
+        let member = await members.findOne({ discord_id: interaction.user.id });
 
-        collector.on('collect', async (collectedInteraction: Interaction) => {
-            if (collectedInteraction.isButton()) {
-                await setupCollector.execute(collectedInteraction);
+        const embed = new EmbedBuilder();
+        embed.setColor(Colors.DarkOrange);
+
+        if (!member) {
+            member = {
+                _id: new UUID(uuid.v7()) as any,
+                discord_id: interaction.user.id,
+                exchanges: {
+                    completed_count: 0,
+                    active: null,
+                    history: []
+                },
+                anilist: null,
+                mal: null,
+                guilds: [{
+                    id: interaction.guild.id,
+                    show_scores: true
+                }]
             };
+
+            await members.insertOne(member);
+
+            embed.setDescription('Hemos registrado tu perfil. ¿Deseas vincular una plataforma?');
+        } else {
+            embed.setDescription('Ya tienes un perfil. ¿Deseas vincular una plataforma?');
+        };
+
+        const cacheID = interaction.client.set(member, 60_000);
+
+        const row = new ActionRowBuilder<ButtonBuilder>();
+        row.addComponents([
+            new ButtonBuilder()
+                .setCustomId(`setup-anilist-button_${cacheID}`)
+                .setLabel('ANILIST')
+                .setStyle(ButtonStyle.Success)
+        ]);
+
+        await interaction.editReply({
+            embeds: [embed],
+            components: [row]
         });
     } catch (error: any) {
         console.error(error);
@@ -31,9 +64,9 @@ module.exports = {
     cooldown: 60,
     data: new SlashCommandBuilder()
         .setName('setup')
-        .setDescription('Sign in with your Anilist account.')
-        .setDescriptionLocalization('es-ES', 'Inicia sesión con tu cuenta de Anilist.')
-        .setDescriptionLocalization('es-419', 'Inicia sesión con tu cuenta de Anilist.')
+        .setDescription('Create your profile.')
+        .setDescriptionLocalization('es-ES', 'Crea tu perfil.')
+        .setDescriptionLocalization('es-419', 'Crea tu perfil.')
         .setNSFW(false)
         .setContexts(InteractionContextType.Guild),
     execute: execute

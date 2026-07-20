@@ -26,9 +26,7 @@ const exchangeCompleteCommandExecute = async (interaction: GuildChatInputCommand
     const cacheID = Date.now().toString(36);
 
     const data = {
-        memberAID: interaction.user.id,
-        memberBID: memberA.exchanges.active.member.discord_id,
-        completed: memberA.exchanges.active.completed || false,
+        memberA: memberA,
         caches: [cacheID]
     };
 
@@ -46,7 +44,7 @@ const exchangeCompleteCommandExecute = async (interaction: GuildChatInputCommand
 
     row.addComponents(
         new ButtonBuilder()
-            .setCustomId(`exchange-complete-button-confirm_${cacheID}`)
+            .setCustomId(`exchange-complete-button_${cacheID}`)
             .setLabel('Estoy seguro')
             .setStyle(ButtonStyle.Success)
     );

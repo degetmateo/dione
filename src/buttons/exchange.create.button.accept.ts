@@ -1,7 +1,7 @@
 import { ButtonInteraction, LabelBuilder, MessageFlags, ModalBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
 import ErrorEmbed from "../embeds/errorEmbed";
 
-export default async (interaction: ButtonInteraction) => {
+const execute = async (interaction: ButtonInteraction) => {
     const values = interaction.customId.split('_');
 
     const bot: any = interaction.client;
@@ -69,4 +69,9 @@ export default async (interaction: ButtonInteraction) => {
     modal.addLabelComponents(labelSelect, labelInput);
 
     await interaction.showModal(modal);
+};
+
+module.exports = {
+    execute,
+    id: 'exchange-create-button-accept'
 };

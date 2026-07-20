@@ -1,11 +1,11 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
 import searchAnimeById from "../../../../command-interactions/anime/searchAnimeById";
 import searchMangaById from "../../../../command-interactions/manga/searchMangaById";
-import mongo from "../../../../database/mongo";
 import ErrorEmbed from "../../../../embeds/errorEmbed";
 import GenericError from "../../../../errors/genericError";
 import GuildChatInputCommandInteraction from "../../../../extensions/guildChatInputCommandInteraction.extension";
-import ExchangeMediaEmbed from "../../../../builders/embeds/exchangeMedia.embed";
+import AnimeEmbed from "../../../../embeds/animeEmbed";
+import MangaEmbed from "../../../../embeds/mangaEmbed";
 
 const exchangeCreateExecute = async (interaction: GuildChatInputCommandInteraction) => {
     const optionMember = interaction.options.getUser('member', true);
@@ -35,7 +35,7 @@ const exchangeCreateExecute = async (interaction: GuildChatInputCommandInteracti
 
         if (error.status === 404) {
             return await interaction.editReply({
-                embeds: [new ErrorEmbed("No hemos encontrado una obra con el ID ingresado.")],
+                embeds: [new ErrorEmbed(`<@${interaction.user.id}>: No hemos encontrado una obra con el ID ingresado.`)],
                 content: null,
                 components: []
             });
@@ -55,6 +55,7 @@ const exchangeCreateExecute = async (interaction: GuildChatInputCommandInteracti
         memberBID: optionMember.id,
         memberAMediaType: mediaType,
         memberAMediaID: mediaId,
+        memberAMediaName: media.title.userPreferred,
         caches: [cacheID]
     };
 
@@ -68,14 +69,17 @@ const exchangeCreateExecute = async (interaction: GuildChatInputCommandInteracti
         .addComponents(
             new ButtonBuilder({
                 style: ButtonStyle.Success,
-                customId: `exch-create-btn-accept_${cacheID}`,
+                customId: `exchange-create-button-accept_${cacheID}`,
                 label: '¡Aceptar intercambio!'
             })
         );
 
+    const embed = data.memberAMediaType === 'ANIME' ? 
+        new AnimeEmbed(media) : new MangaEmbed(media);
+
     await interaction.editReply({
         content: `<@${optionMember.id}>: ¡Puedes aceptar este intercambio!`,
-        embeds: [new ExchangeMediaEmbed(media)],
+        embeds: [embed],
         components: [row]
     });
 };

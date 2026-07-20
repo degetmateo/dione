@@ -51,6 +51,10 @@ export default async (name: string) => {
                 medium
                 color
             }
+            tags {
+                name
+                isMediaSpoiler
+            }
             bannerImage
             genres
             synonyms

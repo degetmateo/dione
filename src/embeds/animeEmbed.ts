@@ -28,14 +28,14 @@ export default class AnimeEmbed extends EmbedBuilder {
         this.setFooter({ text: titles.join(' | ') });
 
         const informacionCampos1 = `
-            ‣ **Formato**: ${data.format || 'Desconocido'}\n‣ **Estado**: ${data.status || 'Desconocido'}\n‣ **Calificación**: ${data.meanScore ? data.meanScore + '/100' : 'Desconocida'}\n‣ **Popularidad**: ${data.popularity || 'Desconocida'}
+            ‣ **Formato**: ${data.format || 'Desconocido'}\n‣ **Estado**: ${data.status || 'Desconocido'}\n‣ **Calificación**: ${data.meanScore ? data.meanScore + '/100' : 'Desconocida'}\n‣ **Popularidad**: ${data.popularity || 'Desconocida'}\n‣ **Favoritos**: ${data.favourites || 'Desconocido'}
         `;
 
         const fechaEmision = data.startDate;
         const fechaString = `${fechaEmision.day}/${fechaEmision.month}/${fechaEmision.year}`;
 
         const informacionCampos2 = `
-            ‣ **Favoritos**: ${data.favourites || 'Desconocido'}\n‣ **Temporada**: ${data.season || 'Desconocida'}\n‣ **Emisión**: ${fechaString || 'Desconocida'}\n‣ **Episodios**: ${data.episodes || 'Desconocidos'}
+            ‣ **ID**: ${data.id}\n‣ **Temporada**: ${data.season || 'Desconocida'}\n‣ **Emisión**: ${fechaString || 'Desconocida'}\n‣ **Episodios**: ${data.episodes || 'Desconocidos'}\n‣ **Fuente**: ${data.source || 'Desconocido'}
         `;
 
         this.addFields({ name: "▾", value: informacionCampos1, inline: true },
@@ -49,5 +49,14 @@ export default class AnimeEmbed extends EmbedBuilder {
 
         this.addFields({ name: "▾ Géneros", value: valueGenres, inline: false });
         this.addFields({ name: "▾ Estudios", value: valueStudios, inline: false });
+
+        const tagsData = data.tags || [];
+        const tags = tagsData.filter((t: { name: string; isMediaSpoiler: boolean }) => !t.isMediaSpoiler);
+        const tagsMapped = tags.map((t: any) => t.name);
+
+        const tagsValue = tags.length >= 1 ?
+            '`' + tagsMapped.join('` - `') + '`' : '`Desconocidos`';
+
+        this.addFields({ name: "▾ Etiquetas", value: tagsValue, inline: false });    
     };
 };

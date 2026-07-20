@@ -3,7 +3,7 @@ import ErrorEmbed from "../embeds/errorEmbed";
 import mongo from "../database/mongo";
 import SuccessEmbed from "../embeds/successEmbed";
 
-const exchangeCreateButtonFinishExecute = async (interaction: ButtonInteraction) => {
+const execute = async (interaction: ButtonInteraction) => {
     const values = interaction.customId.split('_');
 
     const bot: any = interaction.client;
@@ -13,8 +13,10 @@ const exchangeCreateButtonFinishExecute = async (interaction: ButtonInteraction)
         memberBID: string;
         memberAMediaType: string;
         memberAMediaID: string;
+        memberAMediaName: string;
         memberBMediaType: string;
         memberBMediaID: string;
+        memberBMediaName: string;
         caches: string[];
     } = bot.cache.get(values[1]);
 
@@ -71,30 +73,62 @@ const exchangeCreateButtonFinishExecute = async (interaction: ButtonInteraction)
         };
     };
 
+    const date = new Date();
+
     await members.updateOne(
         { _id: memberA._id },
-        { $set: { 'exchanges.active': { 
-            member: { 
-                discord_id: data.memberBID, 
-                media_id: data.memberAMediaID,
-                media_type: data.memberAMediaType
-            },
-            media_id: data.memberBMediaID,
-            media_type: data.memberBMediaType
-        } } }
+        { $set: { 
+            'exchanges.active': {
+                completed: false,
+                created_at: date,
+                completed_at: null,
+                members: {
+                    a: {
+                        media: {
+                            id: data.memberBMediaID,
+                            type: data.memberBMediaType,
+                            name: data.memberBMediaName
+                        }
+                    },
+                    b: {
+                        discord_id: data.memberBID,
+                        media: {
+                            id: data.memberAMediaID,
+                            type: data.memberAMediaType,
+                            name: data.memberAMediaName
+                        }
+                    }
+                }
+            } 
+        } }
     );
 
     await members.updateOne(
         { _id: memberB._id },
-        { $set: { 'exchanges.active': { 
-            member: { 
-                discord_id: data.memberAID, 
-                media_id: data.memberBMediaID,
-                media_type: data.memberBMediaType
-            },
-            media_id: data.memberAMediaID,
-            media_type: data.memberAMediaType
-        } } }
+        { $set: { 
+            'exchanges.active': {
+                completed: false, 
+                created_at: date,
+                completed_at: null,
+                members: {
+                    a: {
+                        media: {
+                            id: data.memberAMediaID,
+                            type: data.memberAMediaType,
+                            name: data.memberAMediaName
+                        }
+                    },
+                    b: {
+                        discord_id: data.memberAID,
+                        media: {
+                            id: data.memberBMediaID,
+                            type: data.memberBMediaType,
+                            name: data.memberBMediaName
+                        }
+                    }
+                }
+            } 
+        } }
     );
 
     await interaction.editReply({
@@ -102,4 +136,7 @@ const exchangeCreateButtonFinishExecute = async (interaction: ButtonInteraction)
     });
 };
 
-export default exchangeCreateButtonFinishExecute;
+module.exports = {
+    execute,
+    id: 'exchange-create-button-finish'
+};
