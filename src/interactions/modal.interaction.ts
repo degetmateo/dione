@@ -11,8 +11,10 @@ export default {
             const id = args[0];
             const bot = interaction.client as Bot;
             const modal = bot.modals.get(id);
+            const cache = args[1];
+            const data = cache ? bot.get(cache) : null;
             if (modal) {
-                return await modal.execute(interaction);
+                return await modal.execute(interaction, data);
             };
         } catch (error: any) {
             console.error(error);
