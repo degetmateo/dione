@@ -23,7 +23,12 @@ const execute = async (interaction: GuildChatInputCommandInteraction) => {
     await interaction.deferReply();
 
     const members = mongo.collection('members');
-    const memberB = await members.findOne({ discord_id: memberOptionB.id });
+    const memberB = await members.findOne({
+        $and: [
+            { discord_id: memberOptionB.id }, 
+            { anilist: { $ne: null }}
+        ]
+    });
 
     if (!memberB) { 
         if(memberOptionB.id === interaction.user.id) {
@@ -33,7 +38,13 @@ const execute = async (interaction: GuildChatInputCommandInteraction) => {
         };
     };
 
-    const memberA = await members.findOne({ discord_id: memberOptionA.id });
+    const memberA = await members.findOne({
+        $and: [
+            { discord_id: memberOptionA.id }, 
+            { anilist: { $ne: null }}
+        ]
+    });
+    
     if (!memberA) throw new GenericError(`<@${memberOptionA.id}> no está registrado. 💔`);
 
     const data = await anilist.search.entries(memberB.anilist.id, memberA.anilist.id);

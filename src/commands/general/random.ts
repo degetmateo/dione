@@ -13,7 +13,12 @@ const execute = async (interaction: GuildChatInputCommandInteraction) => {
     const type = interaction.options.getString('type', true) as "ANIME" | "MANGA";
 
     const members = mongo.collection('members');
-    const member = await members.findOne({ discord_id: interaction.user.id });
+    const member = await members.findOne({
+        $and: [
+            { discord_id: interaction.user.id }, 
+            { anilist: { $ne: null }}
+        ]
+    });
 
     if (!member) throw new GenericError('No estás registrado. Usa el comando `/setup` para registrarte.');
 

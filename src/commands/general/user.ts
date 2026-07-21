@@ -12,7 +12,12 @@ const execute = async (interaction: GuildChatInputCommandInteraction) => {
     const memberId = interaction.options.getUser('member')?.id || interaction.user.id;
 
     const members = mongo.collection('members');
-    const member = await members.findOne({ discord_id: memberId });
+    const member = await members.findOne({ 
+        $and: [
+            { discord_id: memberId }, 
+            { anilist: { $ne: null }}
+        ]
+     });
 
     if (!member) {
         if (memberId === interaction.user.id) {

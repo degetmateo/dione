@@ -18,6 +18,9 @@ const animeExecuteId = async (interaction: GuildChatInputCommandInteraction) => 
                 }, 
                 { 
                     'guilds.show_scores': true 
+                },
+                {
+                    anilist: { $ne: null }
                 }
             ] 
         }
