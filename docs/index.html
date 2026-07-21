@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vinculación MyAnimeList</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 50px; background-color: #2b2d31; color: white; }
+        .code-box { background: #1e1f22; padding: 20px; font-family: monospace; font-size: 24px; border-radius: 8px; word-break: break-all; margin: 20px auto; max-width: 600px; border: 1px solid #5865f2; }
+        .instructions { font-size: 18px; color: #b5bac1; }
+    </style>
+</head>
+<body>
+    <h1>¡Autorización Exitosa!</h1>
+    <p class="instructions">Copia el código que aparece abajo y pégalo en Discord.</p>
+    
+    <div class="code-box" id="codigo">Buscando código...</div>
+
+    <script>
+        // Extraemos los parámetros de la URL
+        const params = new URLSearchParams(window.location.search);
+        const code = params.get('code');
+        
+        const codeBox = document.getElementById('codigo');
+
+        if (code) {
+            // Si el código existe, lo mostramos en pantalla
+            codeBox.innerText = code;
+        } else {
+            // Si el usuario entra a la página sin venir de MAL
+            codeBox.innerText = "Error: No se encontró ningún código de autorización.";
+            codeBox.style.borderColor = "#da373c";
+        }
+    </script>
+</body>
+</html>
