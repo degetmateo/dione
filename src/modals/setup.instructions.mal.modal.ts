@@ -60,6 +60,7 @@ module.exports = {
             { _id: data._id },
             {
                 $set: {
+                    preferred_platform: 'mal',
                     mal: {
                         id: maluser.id,
                         joined_at: new Date(maluser.joined_at),
@@ -78,7 +79,7 @@ module.exports = {
         embed.setThumbnail(maluser.picture);
         embed.setColor('Random');
         embed.setDescription(
-            `Has iniciado sesión correctamente como [${maluser.name}](https://myanimelist.net/profile/${maluser.name}).`
+            `Has iniciado sesión correctamente como [${maluser.name}](https://myanimelist.net/profile/${maluser.name}). Utiliza \`/show-scores\` para decidir si mostrar tus puntuaciones en este servidor.`
         );
 
         return interaction.editReply({

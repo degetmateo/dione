@@ -36,7 +36,15 @@ module.exports = {
 
         const query = await members.findOneAndUpdate(
             { _id: member._id },
-            { $set: { anilist: { id: viewer.id, token: token } } }
+            { 
+                $set: {
+                    preferred_platform: 'anilist', 
+                    anilist: { 
+                        id: viewer.id, 
+                        token: token 
+                    } 
+                } 
+            }
         );
     
         if (!query) {

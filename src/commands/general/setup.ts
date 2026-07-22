@@ -35,9 +35,9 @@ const execute = async (interaction: GuildChatInputCommandInteraction) => {
 
             await members.insertOne(member);
 
-            embed.setDescription('Hemos registrado tu perfil. ¿Deseas vincular una plataforma?');
+            embed.setDescription('Hemos registrado tu perfil. ¿Deseas vincular una plataforma? Ten en cuenta que aún no implementamos todas las funcionalidades para MAL.');
         } else {
-            embed.setDescription('Ya tienes un perfil. ¿Deseas vincular una plataforma?');
+            embed.setDescription('Ya tienes un perfil. ¿Deseas vincular una plataforma? Ten en cuenta que aún no implementamos todas las funcionalidades para MAL.');
         };
 
         const cacheID = interaction.client.set(member, 60_000);
@@ -68,7 +68,7 @@ module.exports = {
     cooldown: 60,
     data: new SlashCommandBuilder()
         .setName('setup')
-        .setDescription('Create your profile.')
+        .setDescription('Setup your profile.')
         .setDescriptionLocalization('es-ES', 'Crea tu perfil.')
         .setDescriptionLocalization('es-419', 'Crea tu perfil.')
         .setNSFW(false)
