@@ -45,7 +45,7 @@ module.exports = {
     cooldown: 5,
     data: new SlashCommandBuilder()
         .setName('random')
-        .setDescription('Get a ramdom anime or manga recomendation from your PTW list.')
+        .setDescription('Get a random anime or manga recomendation from your PTW list.')
         .setNSFW(false)
         .setContexts(InteractionContextType.Guild)
         .addStringOption(option => {

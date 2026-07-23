@@ -133,9 +133,9 @@ module.exports = {
         .setName('user')
         .setContexts(InteractionContextType.Guild)
         .setNSFW(false)
-        .setDescription('User anilist information.')
-        .setDescriptionLocalization('es-ES', 'Información de anilist de un usuario.')
-        .setDescriptionLocalization('es-419', 'Información de anilist de un usuario.')
+        .setDescription('ANILIST or MAL user information.')
+        .setDescriptionLocalization('es-ES', 'Información de ANILIST o MAL de un usuario.')
+        .setDescriptionLocalization('es-419', 'Información de ANILIST o MAL de un usuario.')
         .addUserOption(option => 
             option
                 .setName('member')
