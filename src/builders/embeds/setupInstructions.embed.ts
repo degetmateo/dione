@@ -5,7 +5,7 @@ export default class SetupInstructionsEmbed extends EmbedBuilder {
         super();
 
         this
-            .setTitle('Instrucciones')
+            .setTitle('Instrucciones para vincular ANILIST')
             .setColor(0xff8c00)
             .setFooter({ text: "No compartas los códigos con nadie." })
             .setDescription((

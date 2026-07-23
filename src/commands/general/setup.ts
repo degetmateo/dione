@@ -48,11 +48,15 @@ const execute = async (interaction: GuildChatInputCommandInteraction) => {
             new ButtonBuilder()
                 .setCustomId(`setup-anilist-button_${cacheID}`)
                 .setLabel('ANILIST')
-                .setStyle(ButtonStyle.Success),
+                .setStyle(ButtonStyle.Primary),
             new ButtonBuilder()
                 .setCustomId(`setup-mal-button_${cacheID}`)
                 .setLabel('MyAnimeList')
-                .setStyle(ButtonStyle.Success)
+                .setStyle(ButtonStyle.Primary),
+            new ButtonBuilder()
+                .setCustomId(`setup-vndb-button_${cacheID}`)
+                .setLabel('VNDB')
+                .setStyle(ButtonStyle.Primary)
         ]);
 
         await interaction.editReply({
