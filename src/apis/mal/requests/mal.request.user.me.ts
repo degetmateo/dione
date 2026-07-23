@@ -1,6 +1,6 @@
 import GenericError from "../../../errors/genericError";
 
-const malRequestUserMe: any = async (token: string): Promise<{
+const malRequestUserMe = async (token: string): Promise<{
     id: number;
     name: string;
     joined_at: string;

@@ -1,11 +1,13 @@
 import { EmbedBuilder } from "discord.js";
 
-const userLink = 'https://anilist.co/user/';
+const aniuserLink = 'https://anilist.co/user/';
+const maluserLink = 'https://myanimelist.net/profile/'
 
 export default class ScoresEmbed extends EmbedBuilder {
     constructor (results: Array<{
         user: {
-            id: string;
+            type: 'aniuser' | 'maluser';
+            id: number | string;
             name: string;
         },
         progress: number;
@@ -29,27 +31,67 @@ export default class ScoresEmbed extends EmbedBuilder {
         description += `Promedio del Servidor: **[${meanServerScore.toFixed(2)}]**\n\n`;
 
         if (completed.length > 0) {
-            description += `▸ Completed: ${completed.map(r => `**[${r.user.name}](${userLink}${r.user.id}) [${r.score}] [x${r.repeat+1}]**`).join(' - ')}\n\n`;
+            description += `▸ Completed: ${completed.map(r => {
+                const name = r.user.name;
+                const link = r.user.type === 'aniuser' ? aniuserLink + r.user.name : maluserLink + r.user.name;
+                const score = r.score;
+                const repeat = r.repeat + 1;
+
+                return `**[${name}](${link}) [${score}] [x${repeat}]**`;
+            }).join(' - ')}\n\n`;
         };
 
         if (current.length > 0) {
-            description += `▸ In Progress: ${current.map(r => `**[${r.user.name}](${userLink}${r.user.id}) (${r.progress}) [${r.score}]**`).join(' - ')}\n\n`;
+            description += `▸ In Progress: ${current.map(r => {
+                const name = r.user.name;
+                const link = r.user.type === 'aniuser' ? aniuserLink + r.user.name : maluserLink + r.user.name;
+                const score = r.score;
+                const progress = r.progress;
+
+                return `**[${name}](${link}) (${progress}) [${score}]**`
+            }).join(' - ')}\n\n`;
         };
 
         if (dropped.length > 0) {
-            description += `▸ Dropped: ${dropped.map(r => `**[${r.user.name}](${userLink}${r.user.id}) (${r.progress}) [${r.score}]**`).join(' - ')}\n\n`;
+            description += `▸ Dropped: ${dropped.map(r => {
+                const name = r.user.name;
+                const link = r.user.type === 'aniuser' ? aniuserLink + r.user.name : maluserLink + r.user.name;
+                const score = r.score;
+                const progress = r.progress;
+                
+                return `**[${name}](${link}) (${progress}) [${score}]**`
+            }).join(' - ')}\n\n`;
         };
 
         if (paused.length > 0) {
-            description += `▸ Paused: ${paused.map(r => `**[${r.user.name}](${userLink}${r.user.id}) (${r.progress}) [${r.score}]**`).join(' - ')}\n\n`;
+            description += `▸ Paused: ${paused.map(r => {
+                const name = r.user.name;
+                const link = r.user.type === 'aniuser' ? aniuserLink + r.user.name : maluserLink + r.user.name;
+                const score = r.score;
+                const progress = r.progress;
+
+                return `**[${name}](${link}) (${progress}) [${score}]**`
+            }).join(' - ')}\n\n`;
         };
 
         if (repeating.length > 0) {
-            description += `▸ Repeating: ${repeating.map(r => `**[${r.user.name}](${userLink}${r.user.id}) (${r.progress}) [${r.score}]**`).join(' - ')}\n\n`;
+            description += `▸ Repeating: ${repeating.map(r => {
+                const name = r.user.name;
+                const link = r.user.type === 'aniuser' ? aniuserLink + r.user.name : maluserLink + r.user.name;
+                const score = r.score;
+                const progress = r.progress;
+
+                return `**[${name}](${link}) (${progress}) [${score}]**`
+            }).join(' - ')}\n\n`;
         };
 
         if (planning.length > 0) {
-            description += `▸ Planning: ${planning.map(r => `**[${r.user.name}](${userLink}${r.user.id})**`).join(' - ')}\n\n`;
+            description += `▸ Planning: ${planning.map(r => {
+                const name = r.user.name;
+                const link = r.user.type === 'aniuser' ? aniuserLink + r.user.name : maluserLink + r.user.name;
+                
+                return `**[${name}](${link})**`
+            }).join(' - ')}\n\n`;
         };
 
         if (description.length > 4096) {

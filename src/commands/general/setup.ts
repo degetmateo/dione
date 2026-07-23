@@ -25,6 +25,7 @@ const execute = async (interaction: GuildChatInputCommandInteraction) => {
                     active: null,
                     history: []
                 },
+                preferred_platform: null,
                 anilist: null,
                 mal: null,
                 guilds: [{

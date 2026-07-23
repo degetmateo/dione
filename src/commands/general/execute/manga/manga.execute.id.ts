@@ -1,4 +1,5 @@
 import anilist from "../../../../apis/anilist/anilist";
+import commonRequests from "../../../../apis/common/common.requests";
 import mongo from "../../../../database/mongo";
 import ErrorEmbed from "../../../../embeds/errorEmbed";
 import MangaEmbed from "../../../../embeds/mangaEmbed";
@@ -20,7 +21,7 @@ const mangaExecuteId = async (interaction: GuildChatInputCommandInteraction) => 
                     'guilds.show_scores': true 
                 },
                 {
-                    anilist: { $ne: null }
+                    preferred_platform: { $ne: null } 
                 }
             ] 
         }
@@ -38,7 +39,10 @@ const mangaExecuteId = async (interaction: GuildChatInputCommandInteraction) => 
         });
     };
 
-    const scores = await anilist.search.scores(id, members.map(m => m.anilist.id));
+    const scores = await commonRequests.search.scores({
+        ...data,
+        type: 'MANGA'
+    }, members as any);
 
     const scoresEmbed = scores.length > 0 ?
         new ScoresEmbed(scores) :

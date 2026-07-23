@@ -1,6 +1,6 @@
 import anilist from "../anilist";
 
-const anilistSearchScores = async (mediaId: string, anilistIds: string[]) => {
+const anilistSearchScores = async (mediaId: number | string, anilistIds: string[]) => {
     const query = `
         query {
             users: Page (page: 1, perPage: 50) {

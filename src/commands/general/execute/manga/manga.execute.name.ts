@@ -1,4 +1,4 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } from "discord.js";
 import mongo from "../../../../database/mongo";
 import GenericError from "../../../../errors/genericError";
 import GuildChatInputCommandInteraction from "../../../../extensions/guildChatInputCommandInteraction.extension";
@@ -7,6 +7,7 @@ import ErrorEmbed from "../../../../embeds/errorEmbed";
 import ScoresEmbed from "../../../../embeds/scoresEmbed";
 import MangaEmbed from "../../../../embeds/mangaEmbed";
 import anilist from "../../../../apis/anilist/anilist";
+import commonRequests from "../../../../apis/common/common.requests";
 
 const mangaExecuteName = async (interaction: GuildChatInputCommandInteraction) => {
     const name = interaction.options.getString('name-or-id') as string;
@@ -22,7 +23,7 @@ const mangaExecuteName = async (interaction: GuildChatInputCommandInteraction) =
                     'guilds.show_scores': true 
                 },
                 {
-                    anilist: { $ne: null }
+                    preferred_platform: { $ne: null } 
                 }
             ] 
         }
@@ -35,17 +36,20 @@ const mangaExecuteName = async (interaction: GuildChatInputCommandInteraction) =
     
     const media = data.media;
     const embeds = media.map(m => new MangaEmbed(m));
-    const scores: any = [];
+    const scoresEmbeds: EmbedBuilder[] = [];
 
     let index = 0;
 
     if (members.length <= 0) {
-        scores[index] = new ErrorEmbed('¡Parece que nadie conoce esto!');
+        scoresEmbeds[index] = new ErrorEmbed('¡Parece que nadie conoce esto!');
     } else {
-        const s = await anilist.search.scores(media[index].id, members.map(m => m.anilist.id));
+        const scores = await commonRequests.search.scores({
+            ...media[index],
+            type: 'MANGA'
+        }, members as any);
 
-        scores[index] = s.length > 0 ?
-            new ScoresEmbed(s) :
+        scoresEmbeds[index] = scores.length > 0 ?
+            new ScoresEmbed(scores) :
             new ErrorEmbed('¡Parece que nadie conoce esto!');
     };
     
@@ -53,7 +57,7 @@ const mangaExecuteName = async (interaction: GuildChatInputCommandInteraction) =
         members: members,
         embeds: embeds,
         media: media,
-        scores: scores,
+        scores: scoresEmbeds,
         index: index
     }, 180_000);
 
@@ -69,7 +73,7 @@ const mangaExecuteName = async (interaction: GuildChatInputCommandInteraction) =
     row.addComponents(backButton, nextButton);
 
     await interaction.editReply({
-        embeds: [embeds[index], scores[index]],
+        embeds: [embeds[index], scoresEmbeds[index]],
         components: [row]
     });
 };

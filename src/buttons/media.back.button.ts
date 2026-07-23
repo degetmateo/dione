@@ -3,6 +3,7 @@ import ErrorEmbed from "../embeds/errorEmbed";
 import ScoresEmbed from "../embeds/scoresEmbed";
 import Bot from "../extensions/bot.extension";
 import anilist from "../apis/anilist/anilist";
+import commonRequests from "../apis/common/common.requests";
 
 module.exports = {
     id: 'media-back-button',
@@ -28,10 +29,10 @@ module.exports = {
             if (data.members.length <= 0) {
                 data.scores[data.index] = new ErrorEmbed('¡Parece que nadie conoce esto!');
             } else {
-                const s = await anilist.search.scores(data.media[data.index].id, data.members.map(m => m.anilist.id));
+                const scores = await commonRequests.search.scores(data.media[data.index], data.members);
 
-                data.scores[data.index] = s.length > 0 ?
-                    new ScoresEmbed(s) :
+                data.scores[data.index] = scores.length > 0 ?
+                    new ScoresEmbed(scores) :
                     new ErrorEmbed('¡Parece que nadie conoce esto!');
             };
         };

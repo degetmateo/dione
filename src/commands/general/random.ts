@@ -15,12 +15,16 @@ const execute = async (interaction: GuildChatInputCommandInteraction) => {
     const members = mongo.collection('members');
     const member = await members.findOne({
         $and: [
-            { discord_id: interaction.user.id }, 
-            { anilist: { $ne: null }}
+            { 
+                discord_id: interaction.user.id
+            }, 
+            { 
+                preferred_platform: 'anilist'
+            }
         ]
     });
 
-    if (!member) throw new GenericError('No estás registrado. Usa el comando `/setup` para registrarte.');
+    if (!member) throw new GenericError('No estás registrado. Usa el comando `/setup` para registrarte. Este comando solo funciona para ANILIST.');
 
     const media = await anilist.random({ type: type, user_id: member.anilist.id });
     

@@ -63,6 +63,7 @@ module.exports = {
                     preferred_platform: 'mal',
                     mal: {
                         id: maluser.id,
+                        name: maluser.name,
                         joined_at: new Date(maluser.joined_at),
                         auth: {
                             token_type: tokens.token_type,

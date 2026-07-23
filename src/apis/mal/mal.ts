@@ -1,6 +1,7 @@
 import GenericError from "../../errors/genericError";
 import membersRepository from "../../repositories/members/members.repository";
 import malRequestRefresh from "./requests/mal.request.refresh";
+import malRequestSearchScores from "./requests/mal.request.search.scores";
 import malRequestToken from "./requests/mal.request.token";
 import malRequestUser from "./requests/mal.request.user";
 import malRequestUserMe from "./requests/mal.request.user.me";
@@ -17,8 +18,10 @@ const request = async (uri: string, options?: any) => {
 
         if (!req.ok) {
             if (req.status === 401) {
+                console.error(res);
                 throw new GenericError('Ha ocurrido un error de autorización.');                
             } else {
+                console.error(res);
                 throw new GenericError('Ha ocurrido un error inesperado.');
             };
         };
@@ -73,6 +76,9 @@ const mal = {
     user: {
         me: malRequestUserMe,
         get: malRequestUser
+    },
+    search: {
+        scores: malRequestSearchScores
     }
 };
 

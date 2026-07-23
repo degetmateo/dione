@@ -25,27 +25,35 @@ const execute = async (interaction: GuildChatInputCommandInteraction) => {
     const members = mongo.collection('members');
     const memberB = await members.findOne({
         $and: [
-            { discord_id: memberOptionB.id }, 
-            { anilist: { $ne: null }}
+            { 
+                discord_id: memberOptionB.id
+            }, 
+            { 
+                anilist: { $ne: null }
+            }
         ]
     });
 
     if (!memberB) { 
         if(memberOptionB.id === interaction.user.id) {
-            throw new GenericError('No estás registrado. 💔');
+            throw new GenericError('No estás registrado o no registraste tu ANILIST. 💔');
         } else {
-            throw new GenericError(`<@${memberOptionB.id}> no está registrado. 💔`);
+            throw new GenericError(`<@${memberOptionB.id}> no está registrado o no registró su ANILIST. 💔`);
         };
     };
 
     const memberA = await members.findOne({
         $and: [
-            { discord_id: memberOptionA.id }, 
-            { anilist: { $ne: null }}
+            { 
+                discord_id: memberOptionA.id
+            }, 
+            { 
+                anilist: { $ne: null }
+            }
         ]
     });
     
-    if (!memberA) throw new GenericError(`<@${memberOptionA.id}> no está registrado. 💔`);
+    if (!memberA) throw new GenericError(`<@${memberOptionA.id}> no está registrado o no registró su ANILIST. 💔`);
 
     const data = await anilist.search.entries(memberB.anilist.id, memberA.anilist.id);
 

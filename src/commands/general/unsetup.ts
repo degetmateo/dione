@@ -6,7 +6,8 @@ import GuildChatInputCommandInteraction from "../../extensions/guildChatInputCom
 const execute = async (interaction: GuildChatInputCommandInteraction) => {
     try {
         const embed = new EmbedBuilder();
-        embed.setDescription(`Estás a punto de eliminar completamente tu perfil de Dione. Esto supondrá la pérdida de todos los datos que tienes en el bot. ¿Estás seguro de que quieres hacer esto?`);
+        
+        embed.setDescription(`Estás a punto de eliminar completamente tu perfil de \`Dione\`. **Esto supondrá la pérdida de todos los datos que tienes en el bot**. ¿Estás seguro de que quieres hacer esto?`);
         embed.setColor(Colors.DarkRed);
 
         const id = interaction.client.set({}, 60_000);
