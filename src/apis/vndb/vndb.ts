@@ -1,49 +1,35 @@
 import GenericError from "../../errors/genericError";
-import Helpers from "../../helpers";
-import { codes } from "../../static/codes";
-import { VN } from "./vndbTypes";
 
-export default class VNDB {
-    private static readonly ENDPOINT: string = 'https://api.vndb.org/kana';
-    public static readonly URL: string = 'https://vndb.org';
+const auth = async (token: string): Promise<{
+    id: string;
+    username: string;
+    permissions: Array<string>;
+}> => {
+    const uri = 'https://api.vndb.org/kana/authinfo';
+    return await request(uri, {
+        method: "GET",
+        headers: {
+            "Authorization": "token " + token
+        }
+    }) as any;
+};
 
-    public static async query (args: string) {
-        const request = await fetch (this.ENDPOINT + '/vn', {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify({
-                "results": 5,
-                "page": 1,
-                "filters": [Helpers.isNumber(args) ? "id" : "search", "=", args],
-                "fields": `
-                    title, 
-                    aliases, 
-                    olang, 
-                    devstatus,
-                    released,
-                    languages,
-                    platforms,
-                    length_votes,
-                    length_minutes,
-                    description,
-                    average,
-                    rating,
-                    votecount,
-                    image.url,
-                    image.thumbnail,
-                    tags.name,
-                    screenshots.url,
-                    screenshots.votecount`
-            })
-        });
-
-        if (!request.ok) throw new GenericError(codes[request.status] || null);
-        return await request.json() as {
-            more: boolean;
-            results: Array<VN>;
-        };
+const request = async (uri: string, options: RequestInit) => {
+    try {
+        const req = await fetch(uri, options);
+        const res = await req.json();
+        if (!req.ok) throw res;
+        return res;
+    } catch (error) {
+        console.error(error);
+        if (error instanceof GenericError) throw error;
+        else throw new GenericError();
     };
 };
+
+const vndb = {
+    request,
+    auth
+};
+
+export default vndb;

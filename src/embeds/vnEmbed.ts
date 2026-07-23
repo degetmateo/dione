@@ -1,6 +1,6 @@
 import { EmbedBuilder } from "discord.js";
 import { DEVSTATUS, VN } from "../apis/vndb/vndbTypes";
-import VNDB from "../apis/vndb/vndb";
+import VNDB from "../apis/vndb/vndb.old";
 import Helpers from "../helpers";
 
 export default class VNEmbed extends EmbedBuilder {

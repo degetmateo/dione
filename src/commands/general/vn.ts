@@ -1,6 +1,6 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, InteractionContextType, SlashCommandBuilder } from "discord.js";
 import GuildChatInputCommandInteraction from "../../extensions/guildChatInputCommandInteraction.extension";
-import VNDB from "../../apis/vndb/vndb";
+import VNDB from "../../apis/vndb/vndb.old";
 import VNEmbed from "../../embeds/vnEmbed";
 
 const execute = async (interaction: GuildChatInputCommandInteraction) => {
