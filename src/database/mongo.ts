@@ -1,8 +1,9 @@
 import { CollectionOptions, Db, MongoClient, Collection, Document } from "mongodb";
 import migration from "./migration";
+import { DatabaseError } from "../core/errors";
 
 class MongoDB {
-    private connected: Boolean;
+    private connected: boolean;
     private client: MongoClient;
     public db: Db;
     
@@ -23,12 +24,11 @@ class MongoDB {
         this.claims = {} as Collection;
         this.favourites = {} as Collection;
         this.memberships = {} as Collection;
-    };
+    }
 
     async init () {
         try {
             this.client = new MongoClient(process.env.MONGODB_DATABASE_KEY);
-            
             await this.client.connect();
             
             this.db = this.client.db(process.env.MONGODB_DATABASE_NAME);
@@ -42,19 +42,20 @@ class MongoDB {
             this.memberships = this.collection('memberships');
 
             await migration.execute();
-
             console.log('✅ | MongoDB connected.');
         } catch (error) {
             this.connected = false;
             console.error('🟥 | MongoDB error: ', error);
-        };
-    };
+        }
+    }
 
     collection (collection: string, options?: CollectionOptions) {
-        if (!this.connected) throw new Error('MongoDB not connected.');
+        if (!this.connected) {
+            throw new DatabaseError('MongoDB no está conectado o se encuentra inaccesible.');
+        }
         return this.db.collection(collection, options);
-    };
-};
+    }
+}
 
 const mongo = new MongoDB();
 export default mongo;

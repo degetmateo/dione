@@ -1,117 +1,60 @@
-import { Client, Collection, GatewayIntentBits, SlashCommandBuilder } from "discord.js";
-import eventsHandler from "../handlers/events.handler";
-import commandsHandler from "../handlers/commands.handler";
-import buttonsHandler from "../handlers/buttons.handler";
-import modalsHandler from "../handlers/modals.handler";
-import SettingsModule, { Settings } from "../modules/settings.module";
-import InteractionsManager from "./modules/interactions-manager";
-import mongo from "../database/mongo";
-import { memoryModule } from "../modules/mem.module";
+import { Client, GatewayIntentBits } from 'discord.js';
+import eventsHandler from '../handlers/events.handler';
+import SettingsModule, { Settings } from '../modules/settings.module';
+import mongo from '../database/mongo';
+import { memoryModule } from '../modules/mem.module';
+import { CommandRegistry } from '../presentation/discord/command-registry';
+import { CommandDispatcher } from '../presentation/discord/command-dispatcher';
+import { ButtonRegistry } from '../presentation/discord/button-registry';
+import { ButtonDispatcher } from '../presentation/discord/button-dispatcher';
+import { ModalRegistry } from '../presentation/discord/modal-registry';
+import { ModalDispatcher } from '../presentation/discord/modal-dispatcher';
+import { MaintenanceMiddleware } from '../presentation/discord/middlewares/maintenance.middleware';
+import { CooldownMiddleware } from '../presentation/discord/middlewares/cooldown.middleware';
+import { CommandFactory } from '../presentation/commands/command.factory';
+import { ButtonFactory } from '../presentation/buttons/button.factory';
+import { ModalFactory } from '../presentation/modals/modal.factory';
+import { InteractionCacheService } from '../infrastructure/cache/interaction-cache.service';
 
 class Bot extends Client<true> {
-    public interactionsManager: InteractionsManager;
+    public readonly commandRegistry = new CommandRegistry();
+    public readonly commandDispatcher: CommandDispatcher;
+    public readonly buttonRegistry = new ButtonRegistry();
+    public readonly buttonDispatcher = new ButtonDispatcher(this.buttonRegistry);
+    public readonly modalRegistry = new ModalRegistry();
+    public readonly modalDispatcher = new ModalDispatcher(this.modalRegistry);
+    public readonly cacheService = new InteractionCacheService();
+    public settings = {} as Settings;
 
-    public commands: Collection<string, {
-        cooldown: number;
-        data: SlashCommandBuilder,
-        execute: Function
-    }>;
-
-    public buttons: Collection<string, {
-        id: string;
-        execute: Function
-    }>;
-
-    public modals: Collection<string, {
-        id: string;
-        execute: Function;
-    }>;
-
-    public cooldowns: Collection<string, Collection<string, any>>;
-
-    public cache: Map<string, any>;
-
-    public settings: Settings;
-
-    constructor () {
+    constructor() {
         super({
             intents: [
                 GatewayIntentBits.Guilds,
                 GatewayIntentBits.GuildMembers,
-                GatewayIntentBits.GuildPresences
-            ]
+                GatewayIntentBits.GuildPresences,
+            ],
         });
 
-        this.interactionsManager = new InteractionsManager();
+        this.commandRegistry.registerAll(CommandFactory.createAll());
+        this.buttonRegistry.registerAll(ButtonFactory.createAll());
+        this.modalRegistry.registerAll(ModalFactory.createAll());
 
-        this.settings = {} as Settings;
-        
-        this.commands = new Collection();
-        this.buttons = new Collection();
-        this.modals = new Collection();
-        this.cooldowns = new Collection();
-        this.cache = new Map<string, any>();
+        this.commandDispatcher = new CommandDispatcher(this.commandRegistry);
+        this.commandDispatcher.use(new MaintenanceMiddleware());
+        this.commandDispatcher.use(new CooldownMiddleware(this.commandRegistry));
 
         eventsHandler.load(this);
-        commandsHandler.load(this);
-        buttonsHandler.load(this);
-        modalsHandler.load(this);
-    };
+    }
 
-    set (data: any, expireIn?: number) {
-        const key = Date.now().toString(36);
-
-        data.key = key;
-
-        if (!data.caches) data.caches = [];
-        data.caches.push(key);
-
-        if (!data.timeout) {
-            data.timeout = setTimeout(() => {
-                this.cache.delete(key);
-            }, expireIn || 60_000);
-        };
-
-        this.cache.set(key, data);
-
-        return key;
-    };
-
-    update (key: string, data: any, expireIn?: number) {
-        if (expireIn) {
-            clearTimeout(data.timeout);
-            
-            data.timeout = setTimeout(() => {
-                this.cache.delete(key);
-            }, expireIn);
-        };
-
-        if (!data.key) data.key = key;
-
-        this.cache.set(key, data);
-    };
-
-    get (key: string) {
-        return this.cache.get(key);
-    };
-
-    delete (key: string) {
-        this.cache.delete(key);
-    };
-
-    async fetchUser (id: string) {
+    public async fetchUser(id: string) {
         return await this.users.fetch(id);
-    };
+    }
 
-    async login (token?: string): Promise<string> {
-        const settings = await SettingsModule.read();
-        this.settings = settings;
-
-        const chars = await mongo.characters.find().toArray();
-        memoryModule.characters = chars;
-
+    public async login(token?: string): Promise<string> {
+        this.settings = await SettingsModule.read();
+        memoryModule.characters = await mongo.characters.find().toArray();
         return await super.login(token);
-    };
-};
+    }
+}
 
 export default Bot;

@@ -1,1 +1,0 @@
-export type MediaEntry = { mediaId: number; score: number; };

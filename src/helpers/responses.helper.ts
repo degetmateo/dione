@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, EmbedBuilder, Interaction, InteractionReplyOptions } from "discord.js";
-import ErrorEmbed from "../embeds/errorEmbed";
+import { ErrorEmbed } from '../presentation/ui';
 
 const ok = async (interaction: Interaction, options: InteractionReplyOptions) => {
      try {

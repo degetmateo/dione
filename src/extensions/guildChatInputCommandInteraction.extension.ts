@@ -3,14 +3,14 @@ import { RawInteractionData } from '../../node_modules/discord.js/typings/rawDat
 import Bot from "../bot/bot";
 
 export default class GuildChatInputCommandInteraction extends ChatInputCommandInteraction {
-    public client: Bot;
-    
-    public get guild(): Guild {
-        return this.guild;
+    public override client: Bot;
+
+    public override get guild(): Guild {
+        return super.guild as Guild;
     }
 
-    public get channel(): TextBasedChannel {
-        return this.channel;
+    public override get channel(): TextBasedChannel {
+        return super.channel as TextBasedChannel;
     }
 
     public data: any;
@@ -18,5 +18,5 @@ export default class GuildChatInputCommandInteraction extends ChatInputCommandIn
     constructor (client: Client<true>, data: RawInteractionData) {
         super(client, data);
         this.client = client as Bot;
-    };
-};
+    }
+}
