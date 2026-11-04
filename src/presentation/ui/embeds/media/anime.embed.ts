@@ -14,6 +14,7 @@ export class AnimeEmbed extends EmbedBuilder {
             description = description.slice(0, 4090) + '...';
         }
 
+        this.setAuthor({ name: isMal ? 'MyAnimeList' : 'AniList' });
         this.setColor(anime.getColorAsResolvable());
         if (anime.getCoverImageUrl()) this.setThumbnail(anime.getCoverImageUrl());
         this.setTitle(anime.getTitle());
