@@ -13,7 +13,7 @@ export class MangaSearchHandler {
         await interaction.deferReply();
         const args = interaction.options.getString('name-or-id', true);
         const loc = interaction.locale;
-        const anilist = ApiClientFactory.getAniListClient();
+        const mediaService = ApiClientFactory.getResilientMediaService();
         const scoresService = ApiClientFactory.getCrossPlatformScoresService();
 
         const memberships = await mongo.memberships.find({ guild_id: interaction.guildId, show_scores: true }).toArray();
@@ -23,40 +23,44 @@ export class MangaSearchHandler {
 
         if (Helpers.isNumber(args)) {
             AnimeValidator.validateId(args);
-            const data = await anilist.search.manga.id(args);
-            const mangaEmbed = new MangaEmbed(data);
+            const result = await mediaService.searchMangaById(args);
+            const data = result.data;
+            const mangaEmbed = new MangaEmbed(data, loc);
+            const content = result.fallbackUsed ? I18nService.t(loc, 'media.fallbackNotice') : undefined;
             if (members.length <= 0) {
-                await interaction.editReply({ embeds: [mangaEmbed] });
+                await interaction.editReply({ content, embeds: [mangaEmbed] });
                 return;
             }
-            const scores = await scoresService.searchScores({ ...data, type: 'MANGA' }, members as any);
+            const scores = await scoresService.searchScores({ id: data.getId(), idMal: data.getMalId(), type: 'MANGA' }, members as any);
             const nobodyMsg = I18nService.t(loc, 'media.nobodyKnows');
             const scoresEmbed = scores.length > 0 ? new ScoresEmbed(scores, loc) : new ErrorEmbed(nobodyMsg);
-            await interaction.editReply({ embeds: [mangaEmbed, scoresEmbed] });
+            await interaction.editReply({ content, embeds: [mangaEmbed, scoresEmbed] });
             return;
         }
 
         AnimeValidator.validateName(args);
-        const data: { media: any[] } = await anilist.search.manga.name(args);
-        if (!data?.media || data.media.length <= 0) {
-            throw new BusinessRuleError(I18nService.t(loc, 'api.notFound', { service: 'AniList' }));
+        const result = await mediaService.searchMangaByName(args);
+        const media = result.data;
+        if (!media || media.length <= 0) {
+            const srv = result.provider === 'MAL' ? 'MyAnimeList' : 'AniList';
+            throw new BusinessRuleError(I18nService.t(loc, 'api.notFound', { service: srv }));
         }
 
-        const media = data.media;
-        const embeds = media.map(m => new MangaEmbed(m));
+        const embeds = media.map(m => new MangaEmbed(m, loc));
         const scoresEmbeds: EmbedBuilder[] = [];
         const index = 0;
         const nobodyMsg = I18nService.t(loc, 'media.nobodyKnows');
+        const mediaRefs = media.map(m => ({ id: m.getId(), idMal: m.getMalId(), type: 'MANGA' as const }));
 
         if (members.length <= 0) {
             scoresEmbeds[index] = new ErrorEmbed(nobodyMsg);
         } else {
-            const scores = await scoresService.searchScores({ ...media[index], type: 'MANGA' }, members as any);
+            const scores = await scoresService.searchScores(mediaRefs[index], members as any);
             scoresEmbeds[index] = scores.length > 0 ? new ScoresEmbed(scores, loc) : new ErrorEmbed(nobodyMsg);
         }
 
         const cacheId = InteractionStateService.getInstance().set({
-            members, embeds, media, scores: scoresEmbeds, index,
+            members, embeds, media: mediaRefs, scores: scoresEmbeds, index,
         }, 180_000);
 
         const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
@@ -64,7 +68,7 @@ export class MangaSearchHandler {
             new ButtonBuilder().setCustomId(`media-next-button_${cacheId}`).setLabel('→').setStyle(ButtonStyle.Primary)
         );
 
-        await interaction.editReply({ embeds: [embeds[index], scoresEmbeds[index]], components: [row] });
+        const content = result.fallbackUsed ? I18nService.t(loc, 'media.fallbackNotice') : undefined;
+        await interaction.editReply({ content, embeds: [embeds[index], scoresEmbeds[index]], components: [row] });
     }
 }
-

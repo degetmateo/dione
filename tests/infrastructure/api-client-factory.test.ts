@@ -18,6 +18,10 @@ describe('ApiClientFactory', () => {
         const scores1 = ApiClientFactory.getCrossPlatformScoresService();
         const scores2 = ApiClientFactory.getCrossPlatformScoresService();
         expect(scores1).toBe(scores2);
+
+        const resilient1 = ApiClientFactory.getResilientMediaService();
+        const resilient2 = ApiClientFactory.getResilientMediaService();
+        expect(resilient1).toBe(resilient2);
     });
 });
 

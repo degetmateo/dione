@@ -6,10 +6,13 @@ import GachaSchedulerModule from './modules/gacha.scheduler.module';
 import { TOKEN } from './consts';
 import { ProcessProtection } from './core/resilience/process-protection';
 import { MongooseService } from './infrastructure/database/mongoose.service';
+import { AdminWebServer } from './infrastructure/web/admin-web.server';
+import SettingsModule from './modules/settings.module';
 
 const init = async () => {
     ProcessProtection.initialize();
 
+    await SettingsModule.read();
     await mongo.init();
 
     if (process.env.MONGODB_DATABASE_KEY) {
@@ -20,8 +23,10 @@ const init = async () => {
     }
 
     const bot = new Bot();
-    await bot.login(TOKEN);
+    const adminServer = new AdminWebServer(bot);
+    await adminServer.start().catch(err => console.error('[AdminWebServer] No se pudo iniciar:', err));
 
+    await bot.login(TOKEN);
     GachaSchedulerModule.SCHEDULE_PULLS_RESET(bot);
 };
 

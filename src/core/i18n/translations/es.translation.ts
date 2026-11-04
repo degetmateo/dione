@@ -82,6 +82,12 @@ export class SpanishTranslation {
         media: {
             nobodyKnows: '¡Parece que nadie conoce esto!',
             noVotesVn: 'No hay votos para esta novela visual.',
+            fallbackNotice: '⚠️ AniList no disponible — mostrando datos de respaldo desde MyAnimeList.',
+            sourceLabel: 'Fuente', formatLabel: 'Formato', statusLabel: 'Estado', airedLabel: 'Emisión',
+            seasonLabel: 'Temporada', episodesLabel: 'Episodios', chaptersLabel: 'Capítulos', volumesLabel: 'Volúmenes',
+            scoreLabel: 'Calificación', popularityLabel: 'Popularidad', favoritesLabel: 'Favoritos',
+            genresLabel: 'Géneros', studiosLabel: 'Estudios', tagsLabel: 'Etiquetas',
+            themesLabel: 'Temas y Demografía', authorsLabel: 'Autores', rankLabel: 'Ranking', unknownLabel: 'Desconocido',
         },
     };
 }

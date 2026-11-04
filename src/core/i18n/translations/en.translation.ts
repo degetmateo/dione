@@ -82,6 +82,12 @@ export class EnglishTranslation {
         media: {
             nobodyKnows: 'It seems nobody knows about this!',
             noVotesVn: 'There are no votes for this visual novel.',
+            fallbackNotice: '⚠️ AniList unavailable — showing fallback data from MyAnimeList.',
+            sourceLabel: 'Source', formatLabel: 'Format', statusLabel: 'Status', airedLabel: 'Aired',
+            seasonLabel: 'Season', episodesLabel: 'Episodes', chaptersLabel: 'Chapters', volumesLabel: 'Volumes',
+            scoreLabel: 'Score', popularityLabel: 'Popularity', favoritesLabel: 'Favorites',
+            genresLabel: 'Genres', studiosLabel: 'Studios', tagsLabel: 'Tags',
+            themesLabel: 'Themes & Demographics', authorsLabel: 'Authors', rankLabel: 'Rank', unknownLabel: 'Unknown',
         },
     };
 }

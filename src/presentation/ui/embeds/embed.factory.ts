@@ -35,12 +35,12 @@ export class EmbedFactory {
         return new AffinityEmbed(data);
     }
 
-    public static createAnime(anime: Anianime): AnimeEmbed {
-        return new AnimeEmbed(anime);
+    public static createAnime(anime: Anianime, locale?: string): AnimeEmbed {
+        return new AnimeEmbed(anime, locale);
     }
 
-    public static createManga(data: any): MangaEmbed {
-        return new MangaEmbed(data);
+    public static createManga(data: any, locale?: string): MangaEmbed {
+        return new MangaEmbed(data, locale);
     }
 
     public static createVn(vn: T_VN): VnEmbed {

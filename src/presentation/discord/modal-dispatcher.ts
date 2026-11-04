@@ -11,10 +11,9 @@ export class ModalDispatcher {
     public async dispatch(interaction: ModalSubmitInteraction): Promise<void> {
         const bot = interaction.client as Bot;
         if (bot.settings?.maintenance) {
-            throw new BusinessRuleError(
-                I18nService.t(interaction.locale, 'common.maintenanceMode'),
-                'MAINTENANCE_MODE'
-            );
+            const baseMsg = I18nService.t(interaction.locale, 'common.maintenanceMode');
+            const reason = bot.settings.maintenance_reason;
+            throw new BusinessRuleError(reason ? `${baseMsg}\n> ${reason}` : baseMsg, 'MAINTENANCE_MODE');
         }
 
         const [componentId, cacheId] = interaction.customId.split('_');

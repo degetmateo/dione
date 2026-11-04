@@ -1,6 +1,7 @@
 import { Client, GatewayIntentBits } from 'discord.js';
 import eventsHandler from '../handlers/events.handler';
 import SettingsModule, { Settings } from '../modules/settings.module';
+import { BotSettingsService } from '../core/config/bot-settings.service';
 import mongo from '../database/mongo';
 import { memoryModule } from '../modules/mem.module';
 import { CommandRegistry } from '../presentation/discord/command-registry';
@@ -24,7 +25,7 @@ class Bot extends Client<true> {
     public readonly modalRegistry = new ModalRegistry();
     public readonly modalDispatcher = new ModalDispatcher(this.modalRegistry);
     public readonly cacheService = new InteractionCacheService();
-    public settings = {} as Settings;
+    public settings: Settings = BotSettingsService.getInstance().get();
 
     constructor() {
         super({

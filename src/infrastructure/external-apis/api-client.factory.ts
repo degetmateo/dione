@@ -2,17 +2,17 @@ import { AniListService } from './anilist/anilist.service';
 import { MalService } from './mal/mal.service';
 import { VndbService } from './vndb/vndb.service';
 import { CrossPlatformScoresService } from './common/cross-platform-scores.service';
+import { ResilientMediaService } from './common/resilient-media.service';
 
 export class ApiClientFactory {
     private static anilistInstance?: AniListService;
     private static malInstance?: MalService;
     private static vndbInstance?: VndbService;
     private static crossPlatformScoresInstance?: CrossPlatformScoresService;
+    private static resilientMediaInstance?: ResilientMediaService;
 
     public static getAniListService(): AniListService {
-        if (!this.anilistInstance) {
-            this.anilistInstance = new AniListService();
-        }
+        if (!this.anilistInstance) this.anilistInstance = new AniListService();
         return this.anilistInstance;
     }
 
@@ -21,9 +21,7 @@ export class ApiClientFactory {
     }
 
     public static getMalService(): MalService {
-        if (!this.malInstance) {
-            this.malInstance = new MalService();
-        }
+        if (!this.malInstance) this.malInstance = new MalService();
         return this.malInstance;
     }
 
@@ -32,9 +30,7 @@ export class ApiClientFactory {
     }
 
     public static getVndbService(): VndbService {
-        if (!this.vndbInstance) {
-            this.vndbInstance = new VndbService();
-        }
+        if (!this.vndbInstance) this.vndbInstance = new VndbService();
         return this.vndbInstance;
     }
 
@@ -51,5 +47,14 @@ export class ApiClientFactory {
         }
         return this.crossPlatformScoresInstance;
     }
-}
 
+    public static getResilientMediaService(): ResilientMediaService {
+        if (!this.resilientMediaInstance) {
+            this.resilientMediaInstance = new ResilientMediaService(
+                this.getAniListService(),
+                this.getMalService()
+            );
+        }
+        return this.resilientMediaInstance;
+    }
+}

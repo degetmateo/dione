@@ -1,6 +1,12 @@
+export type MediaProviderSource = 'ANILIST' | 'MAL';
+
 export type AnianimeData = {
+    provider?: MediaProviderSource;
     id: number;
     idMal: number;
+    scoreScale?: 10 | 100;
+    rank?: number | null;
+    studioNames?: string[];
     title: {
         romaji: string;
         english: string;

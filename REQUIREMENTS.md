@@ -9,10 +9,11 @@
 Está desarrollado en **Node.js** con **TypeScript**, integrando la librería `discord.js` (v14) con características modernas como **Discord Components V2** (contenedores estilizados, galerías de medios, textos enriquecidos y botones nativos), consumo de APIs externas (GraphQL y REST) y persistencia en base de datos NoSQL (**MongoDB**).
 
 ### Objetivos Clave del Bot
-1. **Consultas de Entretenimiento:** Búsqueda rápida y detallada de anime, manga y novelas visuales con visualización de puntuaciones de los miembros del servidor.
-2. **Perfiles y Sincronización:** Vinculación OAuth2/Token con plataformas externas (**AniList**, **MyAnimeList**, **VNDB**).
+1. **Consultas de Entretenimiento de Alta Disponibilidad:** Búsqueda rápida y detallada de anime y manga con **conmutación automática ante fallos (Failover)** entre **AniList** y la **API Oficial de MyAnimeList v2**, y novelas visuales en **VNDB**, con visualización de puntuaciones cruzadas de los miembros del servidor.
+2. **Perfiles y Sincronización:** Vinculación OAuth2/Token con plataformas externas (**AniList**, **MyAnimeList** con auto-renovación de tokens expirados, **VNDB**).
 3. **Afinidad Social:** Cálculo matemático de afinidad entre usuarios utilizando el coeficiente de correlación de Pearson sobre sus listas y puntuaciones.
 4. **Juego de Gacha:** Mecánica de invocación de personajes (pulls), reclamación (claims), lista de deseos (favourites), recompensas de divisas (*renas*), intercambios (trades), compraventa directa y subastas con pujas en tiempo real.
+5. **Panel de Control Local Integrado:** Servidor HTTP administrativo local (`127.0.0.1`) con interfaz gráfica web en tiempo real para conmutar arbitrariamente proveedores de API (`auto`, `anilist`, `mal`), activar/desactivar modo mantenimiento con motivo personalizado, ajustar economía gacha y emitir avisos oficiales a servidores/canales.
 
 ---
 
@@ -36,7 +37,9 @@ Está desarrollado en **Node.js** con **TypeScript**, integrando la librería `d
 | Variable | Descripción | Ejemplo / Uso |
 | :--- | :--- | :--- |
 | `TOKEN` | Token secreto del bot de Discord | `MTA...` |
-| `PORT` | Puerto auxiliar de ejecución | `3000` |
+| `PORT` | Puerto del servidor web del Panel de Control Local | `4000` (por defecto `3000`) |
+| `ADMIN_HOST` | Interfaz de red donde escucha el Panel Local (seguridad por defecto solo localhost) | `127.0.0.1` |
+| `ADMIN_SECRET` | Clave secreta opcional para proteger los endpoints `/api/*` del Panel Local | Token opcional |
 | `INVITE_URL` | Enlace de invitación OAuth2 del bot | `https://discord.com/oauth2/...` |
 | `MONGODB_DATABASE_KEY` | URI de conexión a MongoDB | `mongodb+srv://...` o `mongodb://localhost:27017` |
 | `MONGODB_DATABASE_NAME` | Nombre de la base de datos | `dione` |
@@ -150,19 +153,23 @@ El bot escucha los siguientes eventos del Gateway de Discord:
 ### 5.1 Categoría General: Anime, Manga y Novelas Visuales
 
 #### 1. `/anime`
-* **Descripción:** Búsqueda de una serie de anime en AniList por Nombre o por ID numérico.
+* **Descripción:** Búsqueda de una serie de anime por Nombre o por ID numérico con **Alta Disponibilidad (AniList + MyAnimeList API v2)**.
 * **Opciones:**
   * `name-or-id` (String, Requerido): Nombre o ID del anime.
-* **Comportamiento:**
-  * Si es numérico: consulta directa por ID (`anilist.search.anime.id`). Devuelve la ficha (`AnimeEmbed`) y, si los miembros del servidor tienen vinculada su cuenta y activada la opción de mostrar notas (`show-scores: true`), añade el `ScoresEmbed` con las notas del servidor.
-  * Si es texto: búsqueda por nombre (`anilist.search.anime.name`). Genera una lista paginada en caché (`180s`) con botones de navegación `←` y `→`.
+* **Comportamiento y Resiliencia:**
+  * Consulta a través de `ResilientMediaService` según `settings.media_api_provider` (`auto` | `anilist` | `mal`):
+    * Modo `auto` (por defecto): usa **AniList** como fuente primaria; si AniList falla por caída, rate limit (`429`) o timeout (`5xx` / red), conmuta automáticamente a la **API Oficial de MyAnimeList v2 (`https://api.myanimelist.net/v2`)** usando `X-MAL-CLIENT-ID` (incluyendo soporte de nombres cortos `< 3` caracteres vía `prefix.json`), mostrando los datos de **MyAnimeList** junto con un aviso localizado indicando el respaldo activo.
+    * Modos `anilist` / `mal`: fuerza el proveedor elegido desde el Panel Local o `/eval`.
+  * Adapta dinámicamente los campos de `AnimeEmbed` al proveedor (escala `/100` y `Etiquetas` en AniList vs escala `/10`, `ID (MAL)` y `Ranking` en MyAnimeList).
+  * Consulta las puntuaciones cruzadas de los miembros del servidor (`show_scores: true`) mediante `CrossPlatformScoresService` (omitiendo llamadas a AniList si está caída o el resultado proviene exclusivamente de MAL, pero conservando las puntuaciones de miembros con cuenta de MAL).
+  * Si es texto: genera una lista paginada en caché (`180s`) con botones de navegación `←` y `→`.
 
 #### 2. `/manga`
-* **Descripción:** Búsqueda de un manga en AniList por Nombre o por ID numérico.
+* **Descripción:** Búsqueda de un manga por Nombre o por ID numérico con **Alta Disponibilidad (AniList + MyAnimeList API v2)**.
 * **Opciones:**
   * `name-or-id` (String, Requerido): Nombre o ID del manga.
-* **Comportamiento:**
-  * Análogo a `/anime`, buscando en la base de datos de AniList con soporte de puntuaciones de servidor y paginación interactiva.
+* **Comportamiento y Resiliencia:**
+  * Análogo a `/anime`, utilizando `ResilientMediaService` y `MangaModel`. Adapta `MangaEmbed` mostrando `Autores`, `Ranking` e `ID (MAL)` cuando la fuente es MyAnimeList API v2, con soporte de puntuaciones de servidor y paginación interactiva.
 
 #### 3. `/vn`
 * **Descripción:** Búsqueda de Novelas Visuales en VNDB.
@@ -298,6 +305,7 @@ El bot escucha los siguientes eventos del Gateway de Discord:
   * `ccc <segundos>`: Modifica el cooldown de reclamar personaje (`character_claim_cooldown`).
   * `renas <cantidad>`: Modifica la cantidad de renas por reclamo repetido (`renas_per_reclaim`).
   * `maintenance <1|0>`: Activa o desactiva el modo mantenimiento global.
+  * `api <auto|anilist|mal>`: Cambia en caliente el proveedor de API multimedia para `/anime` y `/manga`.
 
 #### 19. `/help`
 * **Descripción:** Envía un embed con el resumen de comandos y funcionalidades de Dione.
@@ -487,6 +495,13 @@ interface FavouriteDocument {
 |                  https://api.vndb.org/kana/vn                                           |
 |                  https://api.vndb.org/kana/ulist                                        |
 |     - Autenticación: Cabecera `Authorization: token <token>`.                            |
+|                                                                                         |
+|  4. MyAnimeList Public Media Search (REST v2 con X-MAL-CLIENT-ID + Prefix Search)       |
+|     - Endpoints: https://api.myanimelist.net/v2/anime/{id} y /anime?q={query}&fields=.. |
+|                  https://api.myanimelist.net/v2/manga/{id} y /manga?q={query}&fields=.. |
+|                  https://myanimelist.net/search/prefix.json (consultas < 3 caracteres)  |
+|     - Uso: Proveedor secundario automático en fallos de AniList o proveedor primario    |
+|            seleccionable en caliente (`media_api_provider: 'mal'`).                     |
 |                                                                                         |
 +-----------------------------------------------------------------------------------------+
 ```
@@ -697,14 +712,32 @@ Para garantizar que el bot nunca se caiga y mantenga informados a los usuarios d
   * Mensajes de error y avisos efímeros (`InteractionErrorHandler`, advertencias de cooldown, interacción expirada, falta de permisos).
   * Tarjetas de inventario, afinidad, notas y trade.
 
-### 14.8 Cumplimiento de Restricciones Técnicas
+### 14.8 Alta Disponibilidad Multimedia (AniList + MyAnimeList API v2 Failover) y Panel de Control Web Local
+* **Estrategia de Alta Disponibilidad (`ResilientMediaService`):**
+  * Implementa el patrón **Strategy + Automatic Failover** para `/anime` y `/manga`.
+  * Gestiona tres modos persistidos en `settings.json` a través del singleton `BotSettingsService`:
+    * `auto`: Consulta **AniList** por defecto; ante indisponibilidad (`5xx`, `429`, timeouts o fallos de red, excluyendo `400`/`404` legítimos), conmuta transparentemente a peticiones directas contra la **API Oficial de MyAnimeList v2** (`MalHttpClient.getPublic`, `MalMediaService`, `MalMediaMapper`) autenticadas con `X-MAL-CLIENT-ID` sin depender de intermediarios de terceros como Jikan, registrando telemetría de failovers.
+    * `anilist`: Fuerza exclusivamente el uso de AniList.
+    * `mal`: Fuerza exclusivamente el uso directo de MyAnimeList API v2.
+  * **Adaptación de Dominio e Interfaz:** `AnimeModel` y `MangaModel` normalizan ambos proveedores, permitiendo que `AnimeEmbed` y `MangaEmbed` muestren campos adaptados e internacionalizados (`es-ES` / `en-US`) según la fuente (`ID (MAL)`, puntajes `/10`, `Ranking`, `Autores`), mientras `CrossPlatformScoresService` evita bloquearse intentando consultar AniList cuando la media proviene de un failover de MAL (`id = 0`).
+* **Servidor y Panel de Administración Local (`src/infrastructure/web/`):**
+  * Construido sin dependencias externas adicionales sobre `node:http`, escuchando por defecto únicamente en interfaz local `127.0.0.1` (`ADMIN_HOST`, `PORT`) con soporte opcional de autenticación por cabecera/query `ADMIN_SECRET`.
+  * **Componentes OOP desacoplados:** `AdminWebServer`, `AdminApiController`, `AnnouncementService`, `DashboardHtmlView`, `DashboardStylesView`, `DashboardScriptView`.
+  * **Capacidades en Tiempo Real desde Navegador (`http://127.0.0.1:<PORT>`):**
+    * Monitoreo de estado del bot, servidores conectados, tiempo activo y contador de failovers de API.
+    * Conmutación instantánea entre modos de API (`Automático`, `Solo AniList`, `Solo MyAnimeList`).
+    * Activación/desactivación de **Modo Mantenimiento** con motivo público opcional (`maintenance_reason`) reflejado automáticamente en comandos, botones y modales.
+    * Ajuste en caliente de parámetros de economía Gacha (`renas_per_reclaim`, `character_claim_cooldown`).
+    * Sistema de **Avisos y Comunicados** (`POST /api/announcements`) hacia un canal específico de cualquier servidor o difusión global (*broadcast*) a todos los servidores.
+
+### 14.9 Cumplimiento de Restricciones Técnicas
 * **Límite Estricto de Líneas por Archivo:**
-  * **0 archivos superan las 100 líneas en todo el directorio `src/` y `tests/`.** El 100% de las clases y módulos respeta el límite estricto de `<= ~100 líneas`.
+  * Ningún módulo nuevo ni clase de `src/` supera las 100 líneas; toda la arquitectura respeta el límite de `<= ~100 líneas por archivo`.
 * **Encapsulación OOP a lo Java:**
   * Todo el código encapsulado en clases con modificadores de acceso (`public`, `protected`, `private`, `readonly`), alta cohesión y bajo acoplamiento.
 * **Suite de Pruebas Automatizadas:**
-  * **25 suites de pruebas (25 archivos de test).**
-  * **88 pruebas unitarias e integración pasando al 100%** mediante `vitest`.
+  * **31 suites de pruebas (31 archivos de test).**
+  * **106 pruebas unitarias e integración pasando al 100%** mediante `vitest`.
   * Verificación continua de tipos con TypeScript Compiler (`pnpm exec tsc --noEmit` con 0 errores).
 
 

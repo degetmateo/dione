@@ -1,11 +1,13 @@
 import { AniListService } from '../anilist/anilist.service';
 import { MalService } from '../mal/mal.service';
 import { ScoreEntry } from '../../../presentation/ui';
+import { BotSettingsService } from '../../../core/config/bot-settings.service';
 
 export class CrossPlatformScoresService {
     public constructor(
         private readonly anilist: AniListService,
-        private readonly mal: MalService
+        private readonly mal: MalService,
+        private readonly settings: BotSettingsService = BotSettingsService.getInstance()
     ) {}
 
     public async searchScores(
@@ -13,9 +15,10 @@ export class CrossPlatformScoresService {
         members: any[]
     ): Promise<ScoreEntry[]> {
         const scores: ScoreEntry[] = [];
+        const mode = this.settings.get().media_api_provider;
 
         const aniusers = members.filter(m => m.preferred_platform === 'anilist' && m.anilist?.id);
-        if (aniusers.length) {
+        if (aniusers.length && media.id && Number(media.id) > 0 && mode !== 'mal') {
             try {
                 const aniscores = await this.anilist.users.searchScores(
                     media.id,
@@ -36,7 +39,7 @@ export class CrossPlatformScoresService {
         }
 
         const malusers = members.filter(m => m.preferred_platform === 'mal' && m.mal?.id && m.mal?.auth?.access_token);
-        if (malusers.length && media.idMal) {
+        if (malusers.length && media.idMal && Number(media.idMal) > 0) {
             try {
                 const malscores = await this.mal.users.searchScores(
                     { id: media.idMal, type: media.type },

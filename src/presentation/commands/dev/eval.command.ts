@@ -3,6 +3,7 @@ import { BaseSlashCommand } from '../../discord/base.slash-command';
 import { BusinessRuleError } from '../../../core/errors/business-rule-error';
 import { ValidationError } from '../../../core/errors/validation-error';
 import SettingsModule from '../../../modules/settings.module';
+import { MediaApiProviderMode } from '../../../core/config/settings.types';
 import Helpers from '../../../helpers';
 import Bot from '../../../bot/bot';
 
@@ -48,7 +49,17 @@ export class EvalCommand extends BaseSlashCommand {
             return;
         }
 
-        await interaction.reply({ content: 'Prefijo no reconocido (opciones: ccc, renas, maintenance).', flags: 'Ephemeral' });
+        if (prefix === 'api') {
+            const valid: MediaApiProviderMode[] = ['auto', 'anilist', 'mal'];
+            if (!param || !valid.includes(param as MediaApiProviderMode)) {
+                throw new ValidationError('Modo inválido. Usa: api <auto|anilist|mal>');
+            }
+            bot.settings.media_api_provider = param as MediaApiProviderMode;
+            await SettingsModule.save(bot.settings);
+            await interaction.reply({ content: `Proveedor de API multimedia cambiado a: ${param.toUpperCase()}.`, flags: 'Ephemeral' });
+            return;
+        }
+
+        await interaction.reply({ content: 'Prefijo no reconocido (opciones: ccc, renas, maintenance, api).', flags: 'Ephemeral' });
     }
 }
-

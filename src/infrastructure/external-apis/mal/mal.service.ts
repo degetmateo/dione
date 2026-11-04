@@ -1,6 +1,7 @@
 import { MalHttpClient } from './mal-http.client';
 import { MalOAuthService } from './mal-oauth.service';
 import { MalUserService, MalAuthContext } from './mal-user.service';
+import { MalMediaService } from './mal-media.service';
 
 export interface MalUserGetOptions {
     id?: number;
@@ -13,11 +14,13 @@ export class MalService {
     public readonly client: MalHttpClient;
     public readonly oauth: MalOAuthService;
     public readonly users: MalUserService;
+    public readonly media: MalMediaService;
 
     public constructor(client?: MalHttpClient) {
         this.client = client ?? new MalHttpClient();
         this.oauth = new MalOAuthService(this.client);
         this.users = new MalUserService(this.client, this.oauth);
+        this.media = new MalMediaService(this.client);
     }
 
     public async request(uri: string, options?: any): Promise<any> {

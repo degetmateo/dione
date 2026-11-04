@@ -62,7 +62,7 @@ export abstract class BaseHttpClient implements IHttpClient {
         }
 
         if (!response.ok) {
-            const message = data?.message || data?.msg || data?.errors?.[0]?.message || response.statusText;
+            const message = data?.message || data?.msg || data?.error || data?.errors?.[0]?.message || response.statusText;
             throw new ExternalApiError(this.serviceName, message, response.status);
         }
         return data as T;

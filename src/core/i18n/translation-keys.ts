@@ -77,7 +77,11 @@ export interface TranslationDictionary {
         showScoresDisabled: string;
     };
     media: {
-        nobodyKnows: string;
-        noVotesVn: string;
+        nobodyKnows: string; noVotesVn: string; fallbackNotice: string;
+        sourceLabel: string; formatLabel: string; statusLabel: string; airedLabel: string;
+        seasonLabel: string; episodesLabel: string; chaptersLabel: string; volumesLabel: string;
+        scoreLabel: string; popularityLabel: string; favoritesLabel: string;
+        genresLabel: string; studiosLabel: string; tagsLabel: string;
+        themesLabel: string; authorsLabel: string; rankLabel: string; unknownLabel: string;
     };
 }

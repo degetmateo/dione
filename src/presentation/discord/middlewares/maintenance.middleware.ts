@@ -8,7 +8,9 @@ export class MaintenanceMiddleware implements ICommandMiddleware {
     public async handle(interaction: ChatInputCommandInteraction, next: NextFunction): Promise<void> {
         const bot = interaction.client as Bot;
         if (bot.settings?.maintenance && interaction.commandName !== 'eval') {
-            const message = I18nService.t(interaction.locale, 'common.maintenanceMode');
+            const baseMsg = I18nService.t(interaction.locale, 'common.maintenanceMode');
+            const reason = bot.settings.maintenance_reason;
+            const message = reason ? `${baseMsg}\n> ${reason}` : baseMsg;
             throw new BusinessRuleError(message, 'MAINTENANCE_MODE');
         }
         await next();

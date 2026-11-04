@@ -6,13 +6,14 @@ import { AnimeEmbed, ErrorEmbed, ScoresEmbed } from '../../../ui';
 import Helpers from '../../../../helpers';
 import { InteractionStateService } from '../../../../infrastructure/cache/interaction-state.service';
 import { I18nService } from '../../../../core/i18n/i18n.service';
+import { BusinessRuleError } from '../../../../core/errors';
 
 export class AnimeSearchHandler {
     public static async handle(interaction: ChatInputCommandInteraction): Promise<void> {
         await interaction.deferReply();
         const args = interaction.options.getString('name-or-id', true);
         const loc = interaction.locale;
-        const anilist = ApiClientFactory.getAniListClient();
+        const mediaService = ApiClientFactory.getResilientMediaService();
         const scoresService = ApiClientFactory.getCrossPlatformScoresService();
 
         const memberships = await mongo.memberships.find({ guild_id: interaction.guildId, show_scores: true }).toArray();
@@ -22,35 +23,44 @@ export class AnimeSearchHandler {
 
         if (Helpers.isNumber(args)) {
             AnimeValidator.validateId(args);
-            const data = await anilist.search.anime.id(args);
-            const animeEmbed = new AnimeEmbed(data);
+            const result = await mediaService.searchAnimeById(args);
+            const data = result.data;
+            const animeEmbed = new AnimeEmbed(data, loc);
+            const content = result.fallbackUsed ? I18nService.t(loc, 'media.fallbackNotice') : undefined;
             if (members.length <= 0) {
-                await interaction.editReply({ embeds: [animeEmbed] });
+                await interaction.editReply({ content, embeds: [animeEmbed] });
                 return;
             }
             const scores = await scoresService.searchScores({ id: data.getId(), idMal: data.getMalId(), type: 'ANIME' }, members as any);
             const nobodyMsg = I18nService.t(loc, 'media.nobodyKnows');
             const scoresEmbed = scores.length > 0 ? new ScoresEmbed(scores, loc) : new ErrorEmbed(nobodyMsg);
-            await interaction.editReply({ embeds: [animeEmbed, scoresEmbed] });
+            await interaction.editReply({ content, embeds: [animeEmbed, scoresEmbed] });
             return;
         }
 
         AnimeValidator.validateName(args);
-        const media = await anilist.search.anime.name(args);
-        const embeds = media.map((m: any) => new AnimeEmbed(m));
+        const result = await mediaService.searchAnimeByName(args);
+        const media = result.data;
+        if (!media || media.length <= 0) {
+            const srv = result.provider === 'MAL' ? 'MyAnimeList' : 'AniList';
+            throw new BusinessRuleError(I18nService.t(loc, 'api.notFound', { service: srv }));
+        }
+
+        const embeds = media.map(m => new AnimeEmbed(m, loc));
         const scoresEmbeds: EmbedBuilder[] = [];
         const index = 0;
         const nobodyMsg = I18nService.t(loc, 'media.nobodyKnows');
+        const mediaRefs = media.map(m => ({ id: m.getId(), idMal: m.getMalId(), type: 'ANIME' as const }));
 
         if (members.length <= 0) {
             scoresEmbeds[index] = new ErrorEmbed(nobodyMsg);
         } else {
-            const scores = await scoresService.searchScores({ id: media[index].getId(), idMal: media[index].getMalId(), type: 'ANIME' }, members as any);
+            const scores = await scoresService.searchScores(mediaRefs[index], members as any);
             scoresEmbeds[index] = scores.length > 0 ? new ScoresEmbed(scores, loc) : new ErrorEmbed(nobodyMsg);
         }
 
         const cacheId = InteractionStateService.getInstance().set({
-            members, embeds, media: media.map((m: any) => m.data), scores: scoresEmbeds, index,
+            members, embeds, media: mediaRefs, scores: scoresEmbeds, index,
         }, 180_000);
 
         const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
@@ -58,6 +68,7 @@ export class AnimeSearchHandler {
             new ButtonBuilder().setCustomId(`media-next-button_${cacheId}`).setLabel('→').setStyle(ButtonStyle.Primary)
         );
 
-        await interaction.editReply({ embeds: [embeds[index], scoresEmbeds[index]], components: [row] });
+        const content = result.fallbackUsed ? I18nService.t(loc, 'media.fallbackNotice') : undefined;
+        await interaction.editReply({ content, embeds: [embeds[index], scoresEmbeds[index]], components: [row] });
     }
 }

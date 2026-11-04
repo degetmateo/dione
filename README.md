@@ -26,7 +26,8 @@
 
 ## ✨ Características Principales
 
-* 🔍 **Consultas Multimedia Exhaustivas:** Búsqueda en tiempo real de animes y mangas en **AniList**, y novelas visuales en **VNDB**, mostrando información completa, enlaces, capturas y valoraciones de los miembros del servidor.
+* 🔍 **Consultas Multimedia de Alta Disponibilidad:** Búsqueda en tiempo real de animes y mangas en **AniList** con **conmutación automática (Failover) a la API Oficial de MyAnimeList v2** cuando AniList no está disponible, y novelas visuales en **VNDB**, mostrando información adaptada por plataforma y valoraciones de los miembros del servidor.
+* 🖥️ **Panel de Control Web Local:** Servidor HTTP local integrado (`http://127.0.0.1:<PORT>`) con interfaz gráfica para alternar manualmente entre APIs (`auto` / `anilist` / `mal`), activar modo mantenimiento con motivo personalizado, ajustar parámetros del gacha y enviar comunicados/avisos a canales o a todos los servidores.
 * 📊 **Notas Comunitarias Cruzadas:** Al buscar una obra, Dione consulta las puntuaciones de los miembros del servidor tanto en **AniList** como en **MyAnimeList**, centralizándolas en una única tarjeta visual.
 * 💖 **Afinidad por Coeficiente de Pearson:** Calcula la compatibilidad exacta de gustos entre dos usuarios analizando cuantitativamente sus listas de anime y manga.
 * 🃏 **Gacha de Personajes:**
@@ -93,10 +94,12 @@ pnpm install
 ### 2. Configurar variables de entorno
 Crea un archivo `.env` en la raíz del proyecto basado en el siguiente ejemplo:
 ```env
-# Discord
+# Discord & Panel de Administración Local
 TOKEN=TU_DISCORD_BOT_TOKEN
 INVITE_URL=https://discord.com/oauth2/authorize?client_id=TU_CLIENT_ID&scope=bot&permissions=8
-PORT=3000
+PORT=4000
+ADMIN_HOST=127.0.0.1
+ADMIN_SECRET=OPCIONAL_CLAVE_PANEL_LOCAL
 DEV_ID=TU_DISCORD_USER_ID
 
 # MongoDB
@@ -202,13 +205,14 @@ El proyecto ha sido reorganizado siguiendo una arquitectura en capas inspirada e
 
 ```
 dione/
-├── tests/                  # Suite completa de pruebas con Vitest (88 tests en 25 suites)
-│   ├── core/               # Pruebas de i18n, protección anti-crash y manejo de errores
+├── tests/                  # Suite completa de pruebas con Vitest (106 tests en 31 suites)
+│   ├── core/               # Pruebas de i18n, configuración en caliente, protección anti-crash y errores
 │   ├── domain/             # Pruebas de Value Objects y Servicios de Dominio
-│   ├── infrastructure/     # Pruebas de repositorios MongoDB, Mongoose, APIs externas y caché
-│   └── presentation/       # Pruebas de Comandos, Botones, Modales, UI Embeds y Discord Components V2
+│   ├── infrastructure/     # Pruebas de MongoDB, Mongoose, APIs (AniList, MAL v2, VNDB), Failover y Panel Web
+│   └── presentation/       # Pruebas de Comandos, Botones, Modales, UI Embeds multi-proveedor y Components V2
 ├── src/
 │   ├── core/               # Núcleo de la aplicación
+│   │   ├── config/         # BotSettingsService (persistencia y sincronización en caliente de settings.json)
 │   │   ├── errors/         # Jerarquía tipada de errores (AppError, ExternalApiError, etc.)
 │   │   ├── i18n/           # Sistema de internacionalización dinámica (es-ES, en-US)
 │   │   └── resilience/     # Blindaje anti-crash global (ProcessProtection, InteractionErrorHandler)
@@ -220,8 +224,9 @@ dione/
 │   ├── infrastructure/     # Implementaciones técnicas y adaptadores
 │   │   ├── cache/          # InteractionStateService (inmutable, con LRU eviction y consume atómico)
 │   │   ├── database/       # Modelos estrictos Mongoose (User, Character, Claim, etc.)
-│   │   ├── external-apis/  # Clientes HTTP y servicios especializados (AniList, MAL, VNDB, Scores)
-│   │   └── repositories/   # Repositorios concretos MongoDB
+│   │   ├── external-apis/  # Clientes HTTP, MAL v2 Media Mapper y ResilientMediaService (Failover)
+│   │   ├── repositories/   # Repositorios concretos MongoDB
+│   │   └── web/            # Servidor y Panel de Administración Local (AdminWebServer + Dashboard)
 │   ├── presentation/       # Capa de interacción con Discord
 │   │   ├── commands/       # Slash commands en clases individuales (Command Pattern + Factory)
 │   │   ├── buttons/        # 31 manejadores de botones en clases (Button Pattern + Factory)
@@ -229,8 +234,8 @@ dione/
 │   │   ├── discord/        # Dispatchers, Registries y Middlewares (Chain of Responsibility)
 │   │   └── ui/             # EmbedFactory, ComponentFactory y Builders de Discord Components V2
 │   ├── bot/                # Inicialización y ciclo de vida limpio del cliente Discord
-│   └── index.ts            # Punto de entrada principal con protección de proceso
-├── REQUERIMIENTOS.md       # Especificaciones exhaustivas y blueprint de arquitectura
+│   └── index.ts            # Punto de entrada principal con protección de proceso y Panel Local
+├── REQUIREMENTS.md         # Especificaciones exhaustivas y blueprint de arquitectura
 ├── package.json
 └── tsconfig.json
 ```
@@ -240,10 +245,11 @@ dione/
 ## 🛡️ Resiliencia y Anti-Crash
 
 * **Sin caídas por excepciones no controladas:** `ProcessProtection.initialize()` captura `uncaughtException` y `unhandledRejection` manteniendo el proceso del bot en funcionamiento continuo.
+* **Alta Disponibilidad Multimedia (Failover):** `ResilientMediaService` detecta indisponibilidades o timeouts de AniList en `/anime` y `/manga` y conmuta automáticamente a **MyAnimeList API v2** adaptando los campos mostrados.
 * **Transparencia para los usuarios:** `InteractionErrorHandler` detecta caídas de servicios externos (AniList, MyAnimeList, VNDB) o de la base de datos, respondiendo con mensajes amigables y efímeros sin mostrar errores crudos de JavaScript.
 * **Internacionalización (i18n):** Respuestas, botones, tarjetas interactivas, embeds y avisos adaptados dinámicamente al idioma del usuario (`interaction.locale`), con soporte completo para Español e Inglés y fallback automático.
-* **Cero archivos mayores a 100 líneas:** Todo el código en `src/` y `tests/` respeta el límite estricto de `<= ~100 líneas por archivo` para máxima legibilidad y mantenibilidad.
-* **Suite de Pruebas Robusta:** 25 archivos de test con 88 pruebas unitarias e integración automáticas pasando al 100% mediante `vitest`.
+* **Límite de ~100 líneas por archivo:** Todo el código fuente en `src/` respeta el límite de `<= ~100 líneas por archivo` para máxima legibilidad y mantenibilidad.
+* **Suite de Pruebas Robusta:** 31 archivos de test con 106 pruebas unitarias e integración automáticas pasando al 100% mediante `vitest`.
 * **Caché Concurrente y Thread-Safe:** `InteractionStateService` elimina *race conditions* en reclamos concurrentes (`consume(key)`) y libera automáticamente memoria con desalojo LRU y expiración cronometrada.
 
 ---
@@ -252,7 +258,7 @@ dione/
 
 Para conocer en detalle todas las especificaciones, decisiones de diseño, contratos de datos y casos de uso, consulta el archivo:
 
-👉 **[REQUERIMIENTOS.md](./REQUERIMIENTOS.md)**
+👉 **[REQUIREMENTS.md](./REQUIREMENTS.md)**
 
 ### Principios Cumplidos en el Código:
 1. **Separación de Responsabilidades (SRP):** Cada clase tiene una sola razón de cambio y no excede ~100 líneas.
